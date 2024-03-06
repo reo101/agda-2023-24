@@ -1,37 +1,56 @@
 open import Level using (Level; _⊔_; suc)
 
+module Lib.≡-Reasoning where
+
 open import Lib.Equality using (_≡_; refl)
 
-module Lib.≡-Reasoning {n : Level} {A : Set n} where
+private
+  variable
+    n m   : Level
+    A     : Set n
+    B     : Set m
+    x y z : A
+
+module Helpers where
+
+  trans : x ≡ y →
+          y ≡ z →
+          -------
+          x ≡ z
+  trans refl refl = refl
+
+  sym : x ≡ y →
+        -------
+        y ≡ x
+  sym refl = refl
+
+  cong : (f : A → B) →
+         -------------
+         x ≡ y →
+         -------
+         f x ≡ f y
+  cong f refl = refl
+
+  cong-app : {f g : A → B} →
+             ---------------
+             f ≡ g →
+             -------
+             ∀ (x : A) → f x ≡ g x
+  cong-app refl x = refl
+
+  subst : (P : A → Set) →
+          ---------------
+          x ≡ y →
+          P x →
+          -------
+          P y
+  subst P refl px = px
+
+open Helpers public
 
 infix  1 begin_
 infixr 2 _≡⟨⟩_ step-≡
 infix  3 _∎
-
-trans : ∀ {n} → ∀ {A : Set n} {x y z : A}
-  → x ≡ y
-  → y ≡ z
-    -----
-  → x ≡ z
-trans refl refl = refl
-
-sym : ∀ {n} → ∀ {A : Set n} {x y : A}
-  → x ≡ y
-    -----
-  → y ≡ x
-sym refl = refl
-
-cong : ∀ {n m} → ∀ {A : Set n} {B : Set m} (f : A → B) {x y : A}
-  → x ≡ y
-    ---------
-  → f x ≡ f y
-cong f refl  =  refl
-
-cong-app : ∀ {n m} → ∀ {A : Set n} {B : Set m} {f g : A → B}
-  → f ≡ g
-    ---------------------
-  → ∀ (x : A) → f x ≡ g x
-cong-app refl x = refl
 
 begin_ : ∀ {x y : A}
   → x ≡ y
@@ -54,3 +73,4 @@ _∎ : ∀ (x : A)
     -----
   → x ≡ x
 x ∎ = refl
+

@@ -32,12 +32,40 @@ record Category : Set (lsuc (o ⊔ ℓ ⊔ e)) where
   --- LAWS ---
   ------------
   field
-    assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘  g) ∘ f  ≈  h ∘ (g  ∘ f)
+    assoc     : ∀ {A B C D}
+                {f : A ⇒ B}
+                {g : B ⇒ C}
+                {h : C ⇒ D} →
+                -----------------------------
+                (h ∘ g) ∘ f ≈ h ∘ (g ∘ f)
+
     -- TODO: remove this????
-    sym-assoc : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} →  h ∘ (g  ∘ f) ≈ (h ∘  g) ∘ f
-    identityˡ : ∀ {A B} {f : A ⇒ B} → id ∘ f  ≈ f
-    identityʳ : ∀ {A B} {f : A ⇒ B} →  f ∘ id ≈ f
-    ∘-resp-≈  : ∀ {A B C} {f h : B ⇒ C} {g i : A ⇒ B} → f ≈ h → g ≈ i → f ∘ g ≈ h ∘ i
+    sym-assoc : ∀ {A B C D}
+                {f : A ⇒ B}
+                {g : B ⇒ C}
+                {h : C ⇒ D} →
+                ---------------------------
+                h ∘ (g ∘ f) ≈ (h ∘ g) ∘ f
+
+    identityˡ : ∀ {A B}
+                {f : A ⇒ B} →
+                -----------
+                id ∘ f ≈ f
+
+    identityʳ : ∀ {A B}
+                {f : A ⇒ B} →
+                ----------
+                f ∘ id ≈ f
+
+    ∘-resp-≈  : ∀ {A B C}
+                {f h : B ⇒ C}
+                {g i : A ⇒ B} →
+                ---------------
+                f ≈ h →
+                g ≈ i →
+                -------------
+                f ∘ g ≈ h ∘ i
+
   ------------
   -- private
   --   variable

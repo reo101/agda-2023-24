@@ -3,41 +3,27 @@ module Project.Functor where
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
 
 open import Lib.Equality using (_≡_; refl)
+open import Lib.≡-Reasoning using (cong; cong-app)
 
 open import Project.Categories using (Category; _[_,_]; _[_≈_]; _[_∘_])
+open import Project.Postulates using (funext)
 
 private
   variable
-    o ℓ e o′ ℓ′ e′ : Level
+    o₁ ℓ₁ e₁ : Level
+    o₂ ℓ₂ e₂ : Level
 
-record Functor (C : Category {o} {ℓ} {e}) (D : Category {o′} {ℓ′} {e′}) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record Functor (C : Category {o₁} {ℓ₁} {e₁}) (D : Category {o₂} {ℓ₂} {e₂}) : Set (o₁ ⊔ ℓ₁ ⊔ e₁ ⊔ o₂ ⊔ ℓ₂ ⊔ e₂) where
   eta-equality
   private module C = Category C
   private module D = Category D
 
-  -- field
-  --   F₀ : C.Obj → D.Obj
-  --   F₁ : ∀ {A B} (f : C [ A , B ]) → D [ F₀ A , F₀ B ]
-  --
-  --   identity     : ∀ {A}
-  --                  → D [ F₁ (C.id {A}) ≈ D.id ]
-  --   homomorphism : ∀ {X Y Z}
-  --                  {f : C [ X , Y ]}
-  --                  {g : C [ Y , Z ]}
-  --                  →   D [ F₁ (C [ g ∘ f ])
-  --                    ≈ D [ F₁ g ∘ F₁ f ] ]
-  --   F-resp-≈     : ∀ {A B}
-  --                  {f g : C [ A , B ]}
-  --                  → C [    f ≈    g ]
-  --                  → D [ F₁ f ≈ F₁ g ]
-  --
-  -- -- nice shorthands
-  -- ₀ = F₀
-  -- ₁ = F₁
-
   field
+    -- Mapping of objects to objects
     F[_] : C.Obj →
            D.Obj
+
+    -- Mapping of morphisms to morphisms
     fmap : ∀ {A B} →
            C [    A   ,    B   ] →
            D [ F[ A ] , F[ B ] ]
@@ -46,16 +32,20 @@ record Functor (C : Category {o} {ℓ} {e}) (D : Category {o′} {ℓ′} {e′}
   --- LAWS ---
   ------------
   field
-    identity     : ∀ {A} →
-                   D [ fmap (C.id {A}) ≈ D.id ]
+    identity     : ∀ {X} →
+                   D [ fmap (C.id {X})
+                     ≈       D.id
+                     ]
+
     homomorphism : ∀ {X Y Z}
                    {f : C [ X , Y ]}
                    {g : C [ Y , Z ]} →
                    D [ fmap (C [      g ∘      f ])
                      ≈       D [ fmap g ∘ fmap f ]
                      ]
-    F-resp-≈     : ∀ {A B}
-                   {f g : C [ A , B ]} →
+
+    F-resp-≈     : ∀ {X Y}
+                   {f g : C [ X , Y ]} →
                    C [      f ≈      g ] →
                    D [ fmap f ≈ fmap g ]
 
@@ -68,7 +58,7 @@ record Functor (C : Category {o} {ℓ} {e}) (D : Category {o′} {ℓ′} {e′}
     ; F-resp-≈     = F-resp-≈
     }
 
-HomFunctor : (C : Category {o} {ℓ} {e}) → Set (o ⊔ ℓ ⊔ e)
+HomFunctor : (C : Category {o₁} {ℓ₁} {e₁}) → Set (o₁ ⊔ ℓ₁ ⊔ e₁)
 HomFunctor C = Functor C C
 
 private
@@ -80,18 +70,30 @@ private
   open Maybe
 
   maybeFunctor : HomFunctor HASK
-  maybeFunctor =
-    record
-      { F[_] = Maybe
-      ; fmap = λ f → λ { nothing → nothing; (just x) → just (f x) }
-      ; identity = λ { {A} → ? }
-      ; homomorphism = {! !}
-      ; F-resp-≈ = {! !} }
+  maybeFunctor = record
+    { F[_] = Maybe
+    ; fmap = λ f →
+        λ { nothing → nothing
+          ; (just x) → just (f x)
+          }
+    ; identity =
+        funext (λ { nothing → refl
+                  ; (just x) → refl
+                  })
+    ; homomorphism =
+        funext (λ { nothing → refl
+                  ; (just x) → refl
+                  })
+    ; F-resp-≈ = λ C[f≈g] →
+        funext (λ { nothing → refl
+                  ; (just x) → cong just (cong-app C[f≈g] x)
+                  })
+    }
 
 private
   op-involutive :
-    {C : Category {o} {ℓ} {e}}
-    {D : Category {o′} {ℓ′} {e′}} →
-    (F : Functor C D) →
+    {C : Category {o₁} {ℓ₁} {e₁}}
+    {D : Category {o₂} {ℓ₂} {e₂}}
+    {F : Functor C D} →
     Functor.op (Functor.op F) ≡ F
-  op-involutive _ = refl
+  op-involutive = refl

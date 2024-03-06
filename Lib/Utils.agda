@@ -1,6 +1,6 @@
-open import Agda.Primitive using (Level)
-
 module Lib.Utils where
+
+open import Agda.Primitive using (Level)
 
 private
   variable
