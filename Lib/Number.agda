@@ -1,10 +1,10 @@
 module Lib.Number where
 
-open import Agda.Primitive using (lsuc)
+open import Level using (suc)
 
 open import Lib.Nat using (ℕ; _<_)
 open import Lib.One using (𝟙)
-open import Lib.Fin using (Fin; natToFin)
+open import Lib.Fin using (Fin; natToFin; alo)
 
 record Number {a} (A : Set a) : Set (lsuc a) where
   field

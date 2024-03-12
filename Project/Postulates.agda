@@ -1,6 +1,6 @@
 module Project.Postulates where
 
-open import Agda.Primitive using (Level)
+open import Level using (Level)
 
 open import Lib.Equality using (_≡_)
 
@@ -10,7 +10,8 @@ postulate
     {l₁ l₂ : Level}
     {A : Set l₁}
     {B : A → Set l₂}
-    {f g : (x : A) → B x}
-    (_ : (x : A) → f x ≡ g x)
-    → -----------------------
+    {f g : (x : A) → B x} →
+    -----------------------
+    ((x : A) → f x ≡ g x) →
+    -----------------------
     f ≡ g

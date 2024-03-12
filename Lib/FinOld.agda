@@ -1,6 +1,6 @@
 module Lib.FinOld where
 
-open import Agda.Primitive using (lzero; lsuc)
+open import Level using (zero; suc)
 
 open import Lib.Nat using (ℕ; zero; suc; _+_; _<_)
 open import Lib.Utils using (id; const; constⁱ)

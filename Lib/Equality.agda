@@ -1,6 +1,6 @@
 module Lib.Equality where
 
-open import Agda.Primitive using (Level; lzero; lsuc)
+open import Level using (Level; zero; suc)
 
 -- data _≡_ {A : Set} : A → A → Set where
 --   refl : {x : A} → x ≡ x

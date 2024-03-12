@@ -52,16 +52,19 @@ infix  1 begin_
 infixr 2 _≡⟨⟩_ step-≡
 infix  3 _∎
 
-begin_ : ∀ {x y : A}
-  → x ≡ y
-    -----
-  → x ≡ y
+begin_ : ∀ {x y : A} →
+         -------------
+         x ≡ y →
+         -----
+         x ≡ y
 begin x≡y = x≡y
 
-_≡⟨⟩_ : ∀ (x : A) {y : A}
-  → x ≡ y
-    -----
-  → x ≡ y
+_≡⟨⟩_ : ∀ (x : A)
+        {y : A} →
+        ---------
+        x ≡ y →
+        -----
+        x ≡ y
 x ≡⟨⟩ x≡y = x≡y
 
 step-≡ : ∀ (x {y z} : A) → y ≡ z → x ≡ y → x ≡ z
@@ -69,8 +72,7 @@ step-≡ x y≡z x≡y = trans x≡y y≡z
 
 syntax step-≡ x y≡z x≡y = x ≡⟨ x≡y ⟩ y≡z
 
-_∎ : ∀ (x : A)
-    -----
-  → x ≡ x
+_∎ : ∀ (x : A) →
+    ------------
+    x ≡ x
 x ∎ = refl
-

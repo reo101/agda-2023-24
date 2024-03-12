@@ -1,4 +1,4 @@
-open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
+open import Level using (Level; zero; suc; _⊔_)
 
 -- Heterogeneous binary relations
 
