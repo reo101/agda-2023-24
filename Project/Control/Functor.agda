@@ -126,21 +126,50 @@ module Helpers where
                using (begin_; _∼⟨⟩_; step-∼; _∎;
                       reflexive; symmetric; transitive)
 
-  _∘_ : Functor 𝔻 𝔼 → Functor ℂ 𝔻 → Functor ℂ 𝔼
-  F ∘ G = record
-    { F[_] = λ x → F [ G [ x ] ]
-    ; fmap = λ f → F [fmap G [fmap f ] ]
-    ; identity = {! !}
-    ; homomorphism = {! !}
-    ; F-resp-≈ = {! !}
+  _∘ᶠ_ : Functor 𝔻 𝔼 → Functor ℂ 𝔻 → Functor ℂ 𝔼
+  _∘ᶠ_ {𝔻 = 𝔻} {𝔼 = 𝔼} {ℂ = ℂ} G F = record
+    { F[_] = λ x → G [ F [ x ] ]
+    ; fmap = λ f → G [fmap F [fmap f ] ]
+    ; identity = λ { {X} →
+        begin
+          G [fmap F [fmap ℂ.id ] ]
+        ∼⟨ G.F-resp-≈ F.identity ⟩
+          G [fmap 𝔻.id ]
+        ∼⟨ G.identity ⟩
+          𝔼.id
+        ∎
+      }
+    ; homomorphism = λ { {X} {Y} {Z} {f} {g} →
+        begin
+          G [fmap F [fmap (ℂ [ g ∘ f ]) ] ]
+        ∼⟨ G.F-resp-≈ F.homomorphism ⟩
+          G [fmap 𝔻 [ F [fmap g ] ∘ F [fmap f ] ] ]
+        ∼⟨ G.homomorphism ⟩
+          𝔼 [ G [fmap F [fmap g ] ] ∘ G [fmap F [fmap f ] ] ]
+        ∎
+      }
+    ; F-resp-≈ = λ { {X} {Y} {f} {g} ℂ[f≈g] →
+        begin
+          G [fmap F [fmap f ] ]
+        ∼⟨ G.F-resp-≈ (F.F-resp-≈ ℂ[f≈g]) ⟩
+          G [fmap F [fmap g ] ]
+        ∎
+      }
     }
     where
       module F = Functor F
       module G = Functor G
-  infixr 20 _∘_
+      module ℂ = Category ℂ
+      module 𝔻 = Category 𝔻
+      module 𝔼 = Category 𝔼
+      open module ≈-Reasoning {A} {B} =
+             EquationalReasoning.Core 𝔼._≈_ {{𝔼.≈-equiv {A} {B}}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎;
+                      reflexive; symmetric; transitive)
+  infixr 20 _∘ᶠ_
 
   _² : HomFunctor ℂ → HomFunctor ℂ
-  F ² = F ∘ F
+  F ² = F ∘ᶠ F
 
 open Helpers public
 

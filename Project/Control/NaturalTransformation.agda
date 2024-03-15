@@ -9,7 +9,7 @@ open import Project.EquationalReasoning as EquationalReasoning
 --          using (begin_; _∼⟨⟩_; step-∼; _∎)
 
 open import Project.Control.Categories using (Category; _[_,_]; _[_≈_]; _[_∘_]; HASK)
-open import Project.Control.Functor using (Functor; HomFunctor; _[_]; _[fmap_]) renaming (_∘_ to _∘F_)
+open import Project.Control.Functor using (Functor; HomFunctor; _[_]; _[fmap_]; _∘ᶠ_)
 open import Project.EquationalReasoning as EquationalReasoning
 open import Project.Postulates using (funext)
 open import Project.Relations using (EquivalenceRelation)
@@ -85,7 +85,7 @@ module Helpers where
          {G G' : Functor 𝔻 𝔼} →
          G ~> G' →
          F ~> F' →
-         G ∘F F ~> G' ∘F F'
+         G ∘ᶠ F ~> G' ∘ᶠ F'
   _∘ₕ_ {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼} {F = F} {F' = F'} {G = G} {G' = G'} β α = record
     { component = λ { x → {! !} ∘ {! !} }
     ; commutativity = {! !}
