@@ -63,9 +63,13 @@ module Helpers where
     { component = λ { x → 𝔻 [ β.component x ∘ α.component x ] }
     ; commutativity = λ { {X} {Y} {f} →
         begin
-          𝔻 [ H [fmap f ] ∘ 𝔻 [ β.component X ∘ α.component X ] ]
+          𝔻 [ H [fmap f ]
+            ∘ 𝔻 [ β.component X ∘ α.component X ]
+            ]
         ∼⟨ ? ⟩
-          𝔻 [ 𝔻 [ β.component Y ∘ α.component Y ] ∘ F [fmap f ] ]
+          𝔻 [ 𝔻 [ β.component Y ∘ α.component Y ]
+            ∘ F [fmap f ]
+            ]
         ∎
       }
     }
@@ -150,7 +154,8 @@ module Helpers where
                 (β′ : G′ ~> G′′) →
                 (β′ ∘ᵥ β ) ∘ₕ (α′ ∘ᵥ α) ≡
                 (β′ ∘ₕ α′) ∘ᵥ (β  ∘ₕ α)
-  interchange {F = F} {F′ = F′} {F′′ = F′′}
+  interchange {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼}
+              {F = F} {F′ = F′} {F′′ = F′′}
               {G = G} {G′ = G′} {G′′ = G′′}
               α α′ β β′ =
     begin
@@ -159,6 +164,19 @@ module Helpers where
       (β′ ∘ₕ α′) ∘ᵥ (β  ∘ₕ α)
     ∎
     where
+      module ℂ   = Category ℂ
+      module 𝔻   = Category 𝔻
+      module 𝔼   = Category 𝔼
+      module F   = Functor F
+      module F′  = Functor F′
+      module F′′ = Functor F′′
+      module G   = Functor G
+      module G′  = Functor G′
+      module G′′ = Functor G′′
+      module α   = NaturalTransformation α
+      module α′  = NaturalTransformation α′
+      module β   = NaturalTransformation β
+      module β′  = NaturalTransformation β′
       open module ≡-Reasoning {n} {A} =
              EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
                using (begin_; _∼⟨⟩_; step-∼; _∎)
