@@ -1,14 +1,12 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 module Project.Control.Functor where
 
 open import Level using (Level; zero; suc; _⊔_)
 
 open import Project.Control.Equality using (_≡_; refl; sym; cong; cong-app; trans; subst; ≡-equiv)
 open import Project.EquationalReasoning as EquationalReasoning
-open module ≡-Reasoning {n} {A} =
-       EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
-         using (begin_; _∼⟨⟩_; step-∼; _∎)
+-- open module ≡-Reasoning {n} {A} =
+--        EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
+--          using (begin_; _∼⟨⟩_; step-∼; _∎)
 
 open import Lib.Utils renaming (_∘_ to _∘ₐ_)
 
@@ -99,10 +97,34 @@ module Helpers where
   Id ℂ = record
     { F[_] = id
     ; fmap = id
-    ; identity = {! !}
-    ; homomorphism = {! !}
-    ; F-resp-≈ = {! !}
+    ; identity = λ { {X} →
+        begin
+          ℂ.id
+        ∎
+      }
+    ; homomorphism = λ { {X} {Y} {Z} {f} {g} →
+        begin
+          ℂ [ g ∘ f ]
+        ∎
+      }
+    ; F-resp-≈ = λ { {X} {Y} {f} {g} ℂ[f≈g] →
+        begin
+          id f
+        ∼⟨⟩
+          f
+        ∼⟨ ℂ[f≈g] ⟩
+          g
+        ∼⟨⟩
+          id g
+        ∎
+      }
     }
+    where
+      module ℂ = Category ℂ
+      open module ≈-Reasoning {A} {B} =
+             EquationalReasoning.Core ℂ._≈_ {{ℂ.≈-equiv {A} {B}}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎;
+                      reflexive; symmetric; transitive)
 
   _∘_ : Functor 𝔻 𝔼 → Functor ℂ 𝔻 → Functor ℂ 𝔼
   F ∘ G = record

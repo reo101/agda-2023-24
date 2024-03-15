@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 module Project.Control.NaturalTransformation where
 
 open import Level using (Level; levelOfTerm; _⊔_)
@@ -61,23 +59,36 @@ module Helpers where
          G ~> H →
          F ~> G →
          F ~> H
-  _∘ᵥ_ {ℂ = ℂ} {𝔻 = 𝔻} β α = record
-    { component = λ { x → β.component x ∘ α.component x }
-    ; commutativity = {! !}
+  _∘ᵥ_ {ℂ = ℂ} {𝔻 = 𝔻} {F = F} {G = G} {H = H} β α = record
+    { component = λ { x → 𝔻 [ β.component x ∘ α.component x ] }
+    ; commutativity = λ { {X} {Y} {f} →
+        begin
+          𝔻 [ H [fmap f ] ∘ 𝔻 [ β.component X ∘ α.component X ] ]
+        ∼⟨ ? ⟩
+          𝔻 [ 𝔻 [ β.component Y ∘ α.component Y ] ∘ F [fmap f ] ]
+        ∎
+      }
     }
     where
-      open Category 𝔻 using (_∘_)
+      module 𝔻 = Category 𝔻
+      module F = Functor F
+      module G = Functor G
+      module H = Functor H
       module α = NaturalTransformation α
       module β = NaturalTransformation β
+      open module ≈-Reasoning {A} {B} =
+             EquationalReasoning.Core 𝔻._≈_ {{𝔻.≈-equiv {A} {B}}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎;
+                      reflexive; symmetric; transitive)
 
   _∘ₕ_ : {F F' : Functor ℂ 𝔻}
          {G G' : Functor 𝔻 𝔼} →
-         F ~> F' →
          G ~> G' →
+         F ~> F' →
          G ∘F F ~> G' ∘F F'
   _∘ₕ_ {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼} {F = F} {F' = F'} {G = G} {G' = G'} β α = record
     { component = λ { x → {! !} ∘ {! !} }
-    ; commutativity = {! kek !}
+    ; commutativity = {! !}
     }
     where
       open Category 𝔼 using (_∘_)
@@ -87,6 +98,28 @@ module Helpers where
       module G' = Functor G'
       module α  = NaturalTransformation α
       module β  = NaturalTransformation β
+
+  interchange : {F F′ F′′ : Functor ℂ 𝔻}
+                {G G′ G′′ : Functor 𝔻 𝔼}
+                (α  : F  ~> F′ )
+                (α′ : F′ ~> F′′)
+                (β  : G  ~> G′ )
+                (β′ : G′ ~> G′′) →
+                (β′ ∘ᵥ β ) ∘ₕ (α′ ∘ᵥ α) ≡
+                (β′ ∘ₕ α′) ∘ᵥ (β  ∘ₕ α)
+  interchange {F = F} {F′ = F′} {F′′ = F′′}
+              {G = G} {G′ = G′} {G′′ = G′′}
+              α α′ β β′ =
+    begin
+      (β′ ∘ᵥ β ) ∘ₕ (α′ ∘ᵥ α)
+    ∼⟨ ? ⟩
+      (β′ ∘ₕ α′) ∘ᵥ (β  ∘ₕ α)
+    ∎
+    where
+      open module ≡-Reasoning {n} {A} =
+             EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎)
+
 
   Id : {ℂ : Category {o₁} {ℓ₁} {e₁}}
        {𝔻 : Category {o₂} {ℓ₂} {e₂}}

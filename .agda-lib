@@ -1,0 +1,10 @@
+name: reo101
+depend:
+  standard-library
+include:
+  .
+flags:
+  --cubical
+  --prop
+  --erasure
+  --allow-unsolved-metas
