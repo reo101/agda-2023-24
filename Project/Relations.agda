@@ -25,4 +25,10 @@ record EquivalenceRelation {A : Set ℓ₁} (_∼_ : A → A → Set ℓ₂) : S
                  -----
                  x ∼ z
 
+-- cong : {A B : Set} →
+--        ∀ {x y} →
+--        (f : A → B) →
+--        x ∼ y →
+--        f x ∼ f y
+
 open EquivalenceRelation public

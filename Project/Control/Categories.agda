@@ -1,18 +1,22 @@
-module Project.Categories where
+module Project.Control.Categories where
 
 open import Level using (Level; zero; suc; _⊔_)
-
-open import Project.Relations using (EquivalenceRelation)
-
-open import Lib.Equality using (_≡_; refl)
-open import Lib.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎; trans; sym; cong; cong-app)
-open import Lib.Utils using (flip) renaming (_∘_ to _∘ₐ_; id to idₐ)
-
--- <https://www.cas.mcmaster.ca/~carette/publications/2005.07059.pdf>
 
 private
   variable
     o ℓ e : Level
+
+open import Project.Relations using (EquivalenceRelation)
+
+open import Project.Control.Equality using (_≡_; refl; sym; cong; cong-app; trans; subst; ≡-equiv)
+open import Project.EquationalReasoning as EquationalReasoning
+open module ≡-Reasoning {n} {A} =
+       EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
+         using (begin_; _∼⟨⟩_; step-∼; _∎)
+
+open import Lib.Utils using (flip) renaming (_∘_ to _∘ₐ_; id to idₐ)
+
+-- <https://www.cas.mcmaster.ca/~carette/publications/2005.07059.pdf>
 
 record Category : Set (suc (o ⊔ ℓ ⊔ e)) where
   eta-equality

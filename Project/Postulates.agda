@@ -2,7 +2,7 @@ module Project.Postulates where
 
 open import Level using (Level)
 
-open import Lib.Equality using (_≡_)
+open import Project.Control.Equality using (_≡_)
 
 postulate
   -- Functional Extensionality

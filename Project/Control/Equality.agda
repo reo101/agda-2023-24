@@ -1,6 +1,8 @@
-module Lib.Equality where
+module Project.Control.Equality where
 
 open import Level using (Level; zero; suc)
+
+open import Project.Relations using (EquivalenceRelation)
 
 -- data _≡_ {A : Set} : A → A → Set where
 --   refl : {x : A} → x ≡ x
@@ -19,10 +21,21 @@ infix 4 _≡_
 module Helpers where
   private
     variable
-      n m : Level
-      A   : Set n
-      B   : Set m
-      x y : A
+      n m   : Level
+      A     : Set n
+      B     : Set m
+      x y z : A
+
+  trans : x ≡ y →
+          y ≡ z →
+          -------
+          x ≡ z
+  trans refl refl = refl
+
+  sym : x ≡ y →
+        -------
+        y ≡ x
+  sym refl = refl
 
   cong : (f : A → B) →
          -----------
@@ -45,5 +58,12 @@ module Helpers where
           -------
           P y
   subst P refl px = px
+
+  ≡-equiv : EquivalenceRelation {A = A} _≡_
+  ≡-equiv = record
+    { reflexive = refl
+    ; symmetric = sym
+    ; transitive = trans
+    }
 
 open Helpers public

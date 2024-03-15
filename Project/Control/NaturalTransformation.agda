@@ -1,22 +1,26 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 
-module Project.NaturalTransformation where
+module Project.Control.NaturalTransformation where
 
 open import Level using (Level; levelOfTerm; _⊔_)
 
-open import Lib.Equality using (_≡_; refl)
-open import Lib.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎; sym; cong; cong-app; trans; subst)
+open import Project.Control.Equality using (_≡_; refl; sym; cong; cong-app; trans; subst; ≡-equiv)
+open import Project.EquationalReasoning as EquationalReasoning
+-- open module ≡-Reasoning {n} {A} =
+--        EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
+--          using (begin_; _∼⟨⟩_; step-∼; _∎)
 
-open import Project.Categories using (Category; _[_,_]; _[_≈_]; _[_∘_]; HASK)
-open import Project.Functor using (Functor; HomFunctor; _[_]; _[fmap_]) renaming (_∘_ to _∘F_)
+open import Project.Control.Categories using (Category; _[_,_]; _[_≈_]; _[_∘_]; HASK)
+open import Project.Control.Functor using (Functor; HomFunctor; _[_]; _[fmap_]) renaming (_∘_ to _∘F_)
+open import Project.EquationalReasoning as EquationalReasoning
 open import Project.Postulates using (funext)
+open import Project.Relations using (EquivalenceRelation)
 
 private
   variable
     o₁ ℓ₁ e₁ : Level
     o₂ ℓ₂ e₂ : Level
     o₃ ℓ₃ e₃ : Level
-
 
 record NaturalTransformation (ℂ : Category {o₁} {ℓ₁} {e₁})
                              (𝔻 : Category {o₂} {ℓ₂} {e₂})
@@ -72,7 +76,7 @@ module Helpers where
          G ~> G' →
          G ∘F F ~> G' ∘F F'
   _∘ₕ_ {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼} {F = F} {F' = F'} {G = G} {G' = G'} β α = record
-    { component = λ { x → ? ∘ ? }
+    { component = λ { x → {! !} ∘ {! !} }
     ; commutativity = {! kek !}
     }
     where
@@ -84,44 +88,44 @@ module Helpers where
       module α  = NaturalTransformation α
       module β  = NaturalTransformation β
 
-  -- TODO: `funext` for morhpisms
-  --       `≈-Reasoning` ?
   Id : {ℂ : Category {o₁} {ℓ₁} {e₁}}
        {𝔻 : Category {o₂} {ℓ₂} {e₂}}
        (F : Functor ℂ 𝔻) →
        F ~> F
-  Id {ℂ = ℂ} F = record
-    { component = λ { X → F [fmap Category.id ℂ ] }
-    ; commutativity = λ { {X} {Y} {f} →
-        ?
+  Id {ℂ = ℂ} {𝔻 = 𝔻} F = record
+    { component = λ { X → F [fmap ℂ.id ] }
+    ; commutativity = λ { {X = X} {Y = Y} {f = f} →
+        begin
+          𝔻 [ F [fmap f ] ∘ F [fmap ℂ.id ] ]
+        ∼⟨ 𝔻.∘-resp-≈ reflexive F.identity ⟩
+          𝔻 [ F [fmap f ] ∘ 𝔻.id ]
+        ∼⟨ 𝔻.identityʳ ⟩
+          F [fmap f ]
+        ∼⟨ symmetric 𝔻.identityˡ ⟩
+          𝔻 [ 𝔻.id ∘ F [fmap f ] ]
+        ∼⟨ 𝔻.∘-resp-≈ (symmetric F.identity) reflexive ⟩
+          𝔻 [ F [fmap ℂ.id ] ∘ F [fmap f ] ]
+        ∎
         -- begin
-        --   𝔻 [ 𝔻 [ F [fmap f ] ∘ F [fmap Category.id ℂ ] ]
-        -- ≈⟨ ? ⟩
-        --   𝔻 [ F [fmap Category.id ℂ ] ∘ F [fmap f ] ] ]
+        --   𝔻 [                  F [fmap f ] ∘ F [fmap ℂ.id ] ]
+        -- ∼⟨ 𝔻.∘-resp-≈ reflexive F.identity ⟩
+        --   𝔻 [                  F [fmap f ] ∘ 𝔻.id           ]
+        -- ∼⟨ 𝔻.identityʳ ⟩
+        --                        F [fmap f ]
+        -- ∼⟨ symmetric 𝔻.identityˡ ⟩
+        --   𝔻 [           𝔻.id ∘ F [fmap f ]                  ]
+        -- ∼⟨ 𝔻.∘-resp-≈ (symmetric F.identity) reflexive ⟩
+        --   𝔻 [ F [fmap ℂ.id ] ∘ F [fmap f ]                  ]
         -- ∎
       }
     }
-
-  IdHASK : (F : HomFunctor HASK) →
-           F ~> F
-  IdHASK F = record
-    { component = λ { X → F [fmap ℂⁱᵈ ] }
-    ; commutativity = λ { {f = f} → funext (λ { x →
-        begin
-          (F [fmap f ]) ((F [fmap ℂⁱᵈ ]) x)
-        ≡⟨ cong (F [fmap f ]) (cong-app Fⁱᵈ _) ⟩ -- _ ≡ x
-          (F [fmap f ]) (ℂⁱᵈ x)
-        ≡⟨⟩
-          (F [fmap f ]) x
-        ≡⟨⟩
-          ℂⁱᵈ ((F [fmap f ]) x)
-        ≡⟨ cong-app (sym Fⁱᵈ) _ ⟩ -- _ ≡ ((F [fmap f ]) x)
-          (F [fmap ℂⁱᵈ ]) ((F [fmap f ]) x)
-        ∎
-      }) }
-    }
     where
-      open Category HASK renaming (id to ℂⁱᵈ)
-      open Functor F renaming (identity to Fⁱᵈ)
+      module ℂ = Category ℂ
+      module 𝔻 = Category 𝔻
+      module F = Functor F
+      open module ≈-Reasoning {A} {B} =
+             EquationalReasoning.Core 𝔻._≈_ {{𝔻.≈-equiv {A} {B}}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎;
+                      reflexive; symmetric; transitive)
 
 open Helpers public
