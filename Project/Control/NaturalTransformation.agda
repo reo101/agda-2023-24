@@ -81,23 +81,66 @@ module Helpers where
                using (begin_; _∼⟨⟩_; step-∼; _∎;
                       reflexive; symmetric; transitive)
 
-  _∘ₕ_ : {F F' : Functor ℂ 𝔻}
-         {G G' : Functor 𝔻 𝔼} →
-         G ~> G' →
-         F ~> F' →
-         G ∘ᶠ F ~> G' ∘ᶠ F'
-  _∘ₕ_ {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼} {F = F} {F' = F'} {G = G} {G' = G'} β α = record
-    { component = λ { x → {! !} ∘ {! !} }
-    ; commutativity = {! !}
+  _∘ₕ_ : {F F′ : Functor ℂ 𝔻}
+         {G G′ : Functor 𝔻 𝔼} →
+         G ~> G′ →
+         F ~> F′ →
+         G ∘ᶠ F ~> G′ ∘ᶠ F′
+  _∘ₕ_ {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼}
+       {F = F} {F′ = F′}
+       {G = G} {G′ = G′}
+       β α = record
+    { component = λ { a → 𝔼 [ G′ [fmap α.component a ] ∘ β.component (F [ a ]) ] }
+    ; commutativity = λ { {a} {b} {f} →
+         begin
+           𝔼 [ G′ [fmap F′ [fmap f ] ]
+             ∘ 𝔼 [ G′ [fmap α.component a ] ∘ β.component (F [ a ]) ]
+             ]
+         ∼⟨ symmetric 𝔼.assoc ⟩
+           𝔼 [ 𝔼 [ G′ [fmap F′ [fmap f ] ] ∘ G′ [fmap α.component a ] ]
+             ∘ β.component (F [ a ])
+             ]
+         ∼⟨ 𝔼.∘-resp-≈ (symmetric G′.homomorphism) reflexive ⟩
+           𝔼 [ G′ [fmap 𝔻 [ F′ [fmap f ] ∘ α.component a ] ]
+             ∘ β.component (F [ a ])
+             ]
+         ∼⟨ β.commutativity ⟩
+           𝔼 [ β.component (F′ [ b ])
+             ∘ G [fmap 𝔻 [ F′ [fmap f ] ∘ α.component a ] ]
+             ]
+         ∼⟨ 𝔼.∘-resp-≈ reflexive (G.F-resp-≈ α.commutativity) ⟩
+           𝔼 [ β.component (F′ [ b ])
+             ∘ G [fmap 𝔻 [ α.component b ∘ F [fmap f ] ] ]
+             ]
+         ∼⟨ 𝔼.∘-resp-≈ reflexive G.homomorphism ⟩
+           𝔼 [ β.component (F′ [ b ])
+             ∘ 𝔼 [ G [fmap α.component b ] ∘ G [fmap F [fmap f ] ] ]
+             ]
+         ∼⟨ symmetric 𝔼.assoc ⟩
+           𝔼 [ 𝔼 [ β.component (F′ [ b ]) ∘ G [fmap α.component b ] ]
+             ∘ G [fmap F [fmap f ] ]
+             ]
+         ∼⟨ 𝔼.∘-resp-≈ (symmetric β.commutativity) reflexive ⟩
+           𝔼 [ 𝔼 [ G′ [fmap α.component b ] ∘ β.component (F [ b ]) ]
+             ∘ G [fmap F [fmap f ] ]
+             ]
+         ∎
+      }
     }
     where
-      open Category 𝔼 using (_∘_)
+      module ℂ = Category ℂ
+      module 𝔻 = Category 𝔻
+      module 𝔼 = Category 𝔼
       module F  = Functor F
-      module F' = Functor F'
+      module F′ = Functor F′
       module G  = Functor G
-      module G' = Functor G'
+      module G′ = Functor G′
       module α  = NaturalTransformation α
       module β  = NaturalTransformation β
+      open module ≈-Reasoning {A} {B} =
+             EquationalReasoning.Core 𝔼._≈_ {{𝔼.≈-equiv {A} {B}}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎;
+                      reflexive; symmetric; transitive)
 
   interchange : {F F′ F′′ : Functor ℂ 𝔻}
                 {G G′ G′′ : Functor 𝔻 𝔼}
