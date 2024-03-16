@@ -60,14 +60,30 @@ module Helpers where
          F ~> G →
          F ~> H
   _∘ᵥ_ {ℂ = ℂ} {𝔻 = 𝔻} {F = F} {G = G} {H = H} β α = record
-    { component = λ { x → 𝔻 [ β.component x ∘ α.component x ] }
-    ; commutativity = λ { {X} {Y} {f} →
+    { component = λ { a → 𝔻 [ β.component a ∘ α.component a ] }
+    ; commutativity = λ { {a} {b} {f} →
         begin
           𝔻 [ H [fmap f ]
-            ∘ 𝔻 [ β.component X ∘ α.component X ]
+            ∘ 𝔻 [ β.component a ∘ α.component a ]
             ]
-        ∼⟨ ? ⟩
-          𝔻 [ 𝔻 [ β.component Y ∘ α.component Y ]
+        ∼⟨ symmetric 𝔻.assoc ⟩
+          𝔻 [ 𝔻 [ H [fmap f ] ∘ β.component a ]
+            ∘ α.component a
+            ]
+        ∼⟨ 𝔻.∘-resp-≈ β.commutativity reflexive ⟩
+          𝔻 [ 𝔻 [ β.component b ∘ G [fmap f ] ]
+            ∘ α.component a
+            ]
+        ∼⟨ 𝔻.assoc ⟩
+          𝔻 [ β.component b
+            ∘ 𝔻 [ G [fmap f ] ∘ α.component a ]
+            ]
+        ∼⟨ 𝔻.∘-resp-≈ reflexive α.commutativity ⟩
+          𝔻 [ β.component b
+            ∘ 𝔻 [ α.component b ∘ F [fmap f ] ]
+            ]
+        ∼⟨ symmetric 𝔻.assoc ⟩
+          𝔻 [ 𝔻 [ β.component b ∘ α.component b ]
             ∘ F [fmap f ]
             ]
         ∎
