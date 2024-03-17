@@ -24,6 +24,8 @@ record NaturalTransformation (ℂ : Category {o₁} {ℓ₁} {e₁})
                              (𝔻 : Category {o₂} {ℓ₂} {e₂})
                              (F G : Functor ℂ 𝔻)
        : Set (o₁ ⊔ ℓ₁ ⊔ e₁ ⊔ o₂ ⊔ ℓ₂ ⊔ e₂) where
+  eta-equality
+
   private module ℂ = Category ℂ
   private module 𝔻 = Category 𝔻
   private module F = Functor F

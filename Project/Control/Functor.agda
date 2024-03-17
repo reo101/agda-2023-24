@@ -18,6 +18,7 @@ private
     o₁ ℓ₁ e₁ : Level
     o₂ ℓ₂ e₂ : Level
     o₃ ℓ₃ e₃ : Level
+    o₄ ℓ₄ e₄ : Level
 
 record Functor (ℂ : Category {o₁} {ℓ₁} {e₁})
                (𝔻 : Category {o₂} {ℓ₂} {e₂})
@@ -167,6 +168,30 @@ module Helpers where
                using (begin_; _∼⟨⟩_; step-∼; _∎;
                       reflexive; symmetric; transitive)
   infixr 20 _∘ᶠ_
+
+  ∘ᶠ-assoc : {A : Category {o₁} {ℓ₁} {e₁}}
+             {B : Category {o₂} {ℓ₂} {e₂}}
+             {C : Category {o₃} {ℓ₃} {e₃}}
+             {D : Category {o₄} {ℓ₄} {e₄}}
+             (F : Functor A B)
+             (G : Functor B C)
+             (H : Functor C D) →
+             (H ∘ᶠ G) ∘ᶠ F ≡ H ∘ᶠ (G ∘ᶠ F)
+  ∘ᶠ-assoc {A = A} {B = B} {C = C} {D = D} F G H =
+    {! !}
+    where
+      module A = Category A
+      module B = Category B
+      module C = Category C
+      module D = Category D
+      module F = Functor F
+      module G = Functor G
+      module H = Functor H
+      module H∘ᶠG = Functor (H ∘ᶠ G)
+      module G∘ᶠF = Functor (G ∘ᶠ F)
+      open module ≡-Reasoning {n} {X} =
+             EquationalReasoning.Core {n} {X} _≡_ {{≡-equiv}}
+               using (begin_; _∼⟨⟩_; step-∼; _∎)
 
   _² : HomFunctor ℂ → HomFunctor ℂ
   F ² = F ∘ᶠ F
