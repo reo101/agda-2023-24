@@ -23,3 +23,7 @@ ff ∨ y = y
 tt ∨ _ = tt
 
 infixr 15 _∨_
+
+if_then_else_ : {A : Set} → 𝟚 → A → A → A
+if ff then t else e = e
+if tt then t else e = t

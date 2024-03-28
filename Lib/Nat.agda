@@ -22,3 +22,8 @@ suc n ≤ suc m = n ≤ m
 
 _<_ : ℕ → ℕ → Set
 n < m = suc n ≤ m
+
+_*_  : ℕ → ℕ → ℕ
+zero * y = zero
+suc x * y = y + (x * y)
+infixr 120 _*_
