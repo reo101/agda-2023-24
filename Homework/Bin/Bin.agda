@@ -257,7 +257,7 @@ fromNat-+N-+B-commutes (ℕ.suc n) m =
   ∼⟨ cong _𝟎 (+B-same-shift b lb) ⟩
     (b 𝟎) 𝟎
   ∎
-+B-same-shift _ ✂𝟏 = refl
++B-same-shift (.✂ 𝟏) ✂𝟏 = refl
 +B-same-shift (b 𝟏) (lb 𝟏) =
   begin
     (suc (b +B b)) 𝟎
