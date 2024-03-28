@@ -8,3 +8,4 @@ flags:
   --prop
   --erasure
   --allow-unsolved-metas
+  -WnoUnsupportedIndexedMatch

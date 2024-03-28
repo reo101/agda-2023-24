@@ -17,6 +17,30 @@ open import Lib.Zero using (𝟘)
 open import Lib.One using (𝟙)
 open import Lib.Two using (𝟚; tt; ff; not; if_then_else_)
 
+module Helpers where
+  lemma1 : (n : ℕ) → n +N ℕ.zero ≡ n
+  lemma1 ℕ.zero = refl
+  lemma1 (ℕ.suc n) =
+    begin
+      ℕ.suc n +N ℕ.zero
+    ∼⟨⟩
+      ℕ.suc (n +N ℕ.zero)
+    ∼⟨ cong ℕ.suc (lemma1 n) ⟩
+      ℕ.suc n
+    ∎
+
+  lemma2 : (n m : ℕ) → n +N ℕ.suc m ≡ ℕ.suc (n +N m)
+  lemma2 ℕ.zero m = refl
+  lemma2 (ℕ.suc n) m =
+    begin
+      ℕ.suc n +N ℕ.suc m
+    ∼⟨⟩
+      ℕ.suc (n +N ℕ.suc m)
+    ∼⟨ cong ℕ.suc (lemma2 n m) ⟩
+      ℕ.suc (ℕ.suc n +N m)
+    ∎
+open Helpers
+
 data Bin : Set where
   ✂  : Bin
   _𝟎 : Bin -> Bin
@@ -99,28 +123,6 @@ toNat-suc (b 𝟏) =
   ∼⟨⟩
     ℕ.suc (toNat (b 𝟏))
   ∎
-  where
-    lemma1 : (n : ℕ) → n +N ℕ.zero ≡ n
-    lemma1 ℕ.zero = refl
-    lemma1 (ℕ.suc n) =
-      begin
-        ℕ.suc n +N ℕ.zero
-      ∼⟨⟩
-        ℕ.suc (n +N ℕ.zero)
-      ∼⟨ cong ℕ.suc (lemma1 n) ⟩
-        ℕ.suc n
-      ∎
-
-    lemma2 : (n m : ℕ) → n +N ℕ.suc m ≡ ℕ.suc (n +N m)
-    lemma2 ℕ.zero m = refl
-    lemma2 (ℕ.suc n) m =
-      begin
-        ℕ.suc n +N ℕ.suc m
-      ∼⟨⟩
-        ℕ.suc (n +N ℕ.suc m)
-      ∼⟨ cong ℕ.suc (lemma2 n m) ⟩
-        ℕ.suc (ℕ.suc n +N m)
-      ∎
 
 to-from-id : (n : ℕ) -> toNat (fromNat n) ≡ n
 to-from-id ℕ.zero = refl
@@ -238,10 +240,67 @@ _ = refl
   ∎
 
 fromNat-+N-+B-commutes : (n m : ℕ) -> fromNat (n +N m) ≡ fromNat n +B fromNat m
-fromNat-+N-+B-commutes = {! !}
+fromNat-+N-+B-commutes ℕ.zero m = refl
+fromNat-+N-+B-commutes (ℕ.suc n) m =
+  begin
+    suc (fromNat (n +N m))
+  ∼⟨ cong suc (fromNat-+N-+B-commutes n m) ⟩
+    suc (fromNat n +B fromNat m)
+  ∼⟨ symmetric (+B-left-suc (fromNat n) (fromNat m))⟩
+    suc (fromNat n) +B fromNat m
+  ∎
 
 +B-same-shift : (b : Bin) -> LeadingOne b -> b +B b ≡ b 𝟎
-+B-same-shift = {! !}
++B-same-shift (b 𝟎) (lb 𝟎) =
+  begin
+    (b +B b) 𝟎
+  ∼⟨ cong _𝟎 (+B-same-shift b lb) ⟩
+    (b 𝟎) 𝟎
+  ∎
++B-same-shift _ ✂𝟏 = refl
++B-same-shift (b 𝟏) (lb 𝟏) =
+  begin
+    (suc (b +B b)) 𝟎
+  ∼⟨ cong _𝟎 (cong suc (+B-same-shift b lb)) ⟩
+    (suc (b 𝟎)) 𝟎
+  ∼⟨⟩
+    (b 𝟏) 𝟎
+  ∎
 
 from-to-id-Can : (b : Bin) -> Can b -> fromNat (toNat b) ≡ b
-from-to-id-Can = {! !}
+from-to-id-Can ✂ ✂ = refl
+from-to-id-Can (.✂ 𝟏) (leadingOne ✂𝟏) = refl
+from-to-id-Can (b 𝟎) (leadingOne (lb 𝟎)) =
+  begin
+    fromNat (toNat (b 𝟎))
+  ∼⟨⟩
+    fromNat (toNat b +N (toNat b +N ℕ.zero))
+  ∼⟨ cong fromNat (cong (toNat b +N_) (lemma1 (toNat b))) ⟩
+    fromNat (toNat b +N toNat b)
+  ∼⟨ fromNat-+N-+B-commutes (toNat b) (toNat b) ⟩
+    fromNat (toNat b) +B fromNat (toNat b)
+  ∼⟨ cong-app (cong _+B_ (from-to-id-Can b (leadingOne lb))) (fromNat (toNat b)) ⟩
+    b +B fromNat (toNat b)
+  ∼⟨ cong (b +B_) (from-to-id-Can b (leadingOne lb)) ⟩
+    b +B b
+  ∼⟨ +B-same-shift b lb ⟩
+    b 𝟎
+  ∎
+from-to-id-Can (b 𝟏) (leadingOne (lb 𝟏)) =
+  begin
+    fromNat (toNat (b 𝟏))
+  ∼⟨⟩
+    suc (fromNat (toNat b +N (toNat b +N ℕ.zero)))
+  ∼⟨ cong suc (cong fromNat (cong (toNat b +N_) (lemma1 (toNat b)))) ⟩
+    suc (fromNat (toNat b +N toNat b))
+  ∼⟨ cong suc (fromNat-+N-+B-commutes (toNat b) (toNat b)) ⟩
+    suc (fromNat (toNat b) +B fromNat (toNat b))
+  ∼⟨ cong suc (cong-app (cong _+B_ (from-to-id-Can b (leadingOne lb))) (fromNat (toNat b))) ⟩
+    suc (b +B fromNat (toNat b))
+  ∼⟨ cong suc (cong (b +B_) (from-to-id-Can b (leadingOne lb))) ⟩
+    suc (b +B b)
+  ∼⟨ cong suc (+B-same-shift b lb) ⟩
+    suc (b 𝟎)
+  ∼⟨⟩
+    b 𝟏
+  ∎
