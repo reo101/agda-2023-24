@@ -164,42 +164,6 @@ module Helpers where
                using (begin_; _∼⟨⟩_; step-∼; _∎;
                       reflexive; symmetric; transitive)
 
-  interchange : {F F′ F′′ : Functor ℂ 𝔻}
-                {G G′ G′′ : Functor 𝔻 𝔼}
-                (α  : F  ~> F′ )
-                (α′ : F′ ~> F′′)
-                (β  : G  ~> G′ )
-                (β′ : G′ ~> G′′) →
-                (β′ ∘ᵥ β ) ∘ₕ (α′ ∘ᵥ α) ≡
-                (β′ ∘ₕ α′) ∘ᵥ (β  ∘ₕ α)
-  interchange {ℂ = ℂ} {𝔻 = 𝔻} {𝔼 = 𝔼}
-              {F = F} {F′ = F′} {F′′ = F′′}
-              {G = G} {G′ = G′} {G′′ = G′′}
-              α α′ β β′ =
-    begin
-      (β′ ∘ᵥ β ) ∘ₕ (α′ ∘ᵥ α)
-    ∼⟨ ? ⟩
-      (β′ ∘ₕ α′) ∘ᵥ (β  ∘ₕ α)
-    ∎
-    where
-      module ℂ   = Category ℂ
-      module 𝔻   = Category 𝔻
-      module 𝔼   = Category 𝔼
-      module F   = Functor F
-      module F′  = Functor F′
-      module F′′ = Functor F′′
-      module G   = Functor G
-      module G′  = Functor G′
-      module G′′ = Functor G′′
-      module α   = NaturalTransformation α
-      module α′  = NaturalTransformation α′
-      module β   = NaturalTransformation β
-      module β′  = NaturalTransformation β′
-      open module ≡-Reasoning {n} {A} =
-             EquationalReasoning.Core {n} {A} _≡_ {{≡-equiv}}
-               using (begin_; _∼⟨⟩_; step-∼; _∎)
-
-
   Id : {ℂ : Category {o₁} {ℓ₁} {e₁}}
        {𝔻 : Category {o₂} {ℓ₂} {e₂}}
        (F : Functor ℂ 𝔻) →
