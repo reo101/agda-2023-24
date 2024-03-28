@@ -60,7 +60,7 @@ module Helpers where
   NI-equiv {ℂ = ℂ} {𝔻 = 𝔻} = record
     { reflexive = λ {F} →
       let module F = Functor F
-      in record
+       in record
         { F~>G = Idⁿ F
         ; G~>F = Idⁿ F
         ; isomorphism = λ {X} → record

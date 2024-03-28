@@ -110,7 +110,7 @@ module Helpers where
 
 open Helpers public
 
-HASK : Category
+HASK : Category {suc zero} {zero} {zero}
 HASK =
   record
     { Obj       = Set

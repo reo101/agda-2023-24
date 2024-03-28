@@ -39,8 +39,8 @@ record Adjunction (ℂ : Category {o₁} {ℓ₁} {e₁})
     ε : L ∘ᶠ R ~> Idᶠ ℂ
     η : Idᶠ 𝔻 ~> R ∘ᶠ L
 
-  private module ε = NaturalTransformation ε
-  private module η = NaturalTransformation η
+  module ε = NaturalTransformation ε
+  module η = NaturalTransformation η
 
   ------------
   --- LAWS ---
@@ -68,11 +68,11 @@ module Helpers where
 
   monadFromAdjunction : {ℂ : Category {o₁} {ℓ₁} {e₁}}
                         {𝔻 : Category {o₁} {ℓ₁} {e₁}}
-                        (L : Functor 𝔻 ℂ)
-                        (R : Functor ℂ 𝔻)
+                        {L : Functor 𝔻 ℂ}
+                        {R : Functor ℂ 𝔻}
                         (L⊣R : L ⊣ R) →
                         Monad 𝔻
-  monadFromAdjunction {ℂ = ℂ} {𝔻 = 𝔻} L R L⊣R = record
+  monadFromAdjunction {ℂ = ℂ} {𝔻 = 𝔻} {L = L} {R = R} L⊣R = record
     { F = R ∘ᶠ L
     ; η = L⊣R.η
     ; μ = record
