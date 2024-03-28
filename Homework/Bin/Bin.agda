@@ -144,17 +144,27 @@ data Can : Bin -> Set where
   ✂ : Can ✂
   leadingOne : {b : Bin} -> LeadingOne b -> Can b
 
-suc-LeadingOne : (b : Bin) -> LeadingOne b -> LeadingOne (suc b)
-suc-LeadingOne = {! !}
+suc-LeadingOne : {b : Bin} -> LeadingOne b -> LeadingOne (suc b)
+suc-LeadingOne ✂𝟏 = ✂𝟏 𝟎
+suc-LeadingOne (lb 𝟎) = lb 𝟏
+suc-LeadingOne (lb 𝟏) = (suc-LeadingOne lb) 𝟎
 
-suc-Can : (b : Bin) -> Can b -> Can (suc b)
-suc-Can = {! !}
+suc-Can : {b : Bin} -> Can b -> Can (suc b)
+suc-Can ✂ = leadingOne ✂𝟏
+suc-Can (leadingOne lb) = leadingOne (suc-LeadingOne lb)
 
 fromNat-Can : (n : ℕ) -> Can (fromNat n)
-fromNat-Can = {! !}
+fromNat-Can ℕ.zero = ✂
+fromNat-Can (ℕ.suc n) = suc-Can (fromNat-Can n)
 
 _+B_ : Bin -> Bin -> Bin
-_+B_ = {! !}
+✂ +B b₂ = b₂
+b₁ 𝟎 +B ✂ = b₁ 𝟎
+b₁ 𝟏 +B ✂ = b₁ 𝟏
+b₁ 𝟎 +B b₂ 𝟎 = (b₁ +B b₂) 𝟎
+b₁ 𝟎 +B b₂ 𝟏 = (b₁ +B b₂) 𝟏
+b₁ 𝟏 +B b₂ 𝟎 = (b₁ +B b₂) 𝟏
+b₁ 𝟏 +B b₂ 𝟏 = (suc (b₁ +B b₂)) 𝟎
 
 infixr 11 _+B_
 
@@ -171,13 +181,61 @@ _ : ✂ 𝟏 𝟏 𝟏 +B ✂ 𝟏 𝟎 𝟏 ≡ ✂ 𝟏 𝟏 𝟎 𝟎
 _ = refl
 
 +B-right-end : (b : Bin) -> b +B ✂ ≡ b
-+B-right-end = {! !}
++B-right-end ✂ = refl
++B-right-end (b 𝟎) = refl
++B-right-end (b 𝟏) = refl
 
-+B-left-suc : (b v : Bin) -> suc b +B v ≡ suc (b +B v)
-+B-left-suc = {! !}
++B-left-suc : (b₁ b₂ : Bin) -> suc b₁ +B b₂ ≡ suc (b₁ +B b₂)
++B-left-suc ✂ ✂ = refl
++B-left-suc ✂ (b₂ 𝟎) = refl
++B-left-suc ✂ (b₂ 𝟏) = refl
++B-left-suc (b₁ 𝟎) ✂ = refl
++B-left-suc (b₁ 𝟎) (b₂ 𝟎) = refl
++B-left-suc (b₁ 𝟎) (b₂ 𝟏) = refl
++B-left-suc (b₁ 𝟏) ✂ = refl
++B-left-suc (b₁ 𝟏) (b₂ 𝟎) =
+  begin
+    (suc b₁ +B b₂) 𝟎
+  ∼⟨ cong _𝟎 (+B-left-suc b₁ b₂) ⟩
+    (suc (b₁ +B b₂)) 𝟎
+  ∎
++B-left-suc (b₁ 𝟏) (b₂ 𝟏) =
+  begin
+    (suc b₁ +B b₂) 𝟏
+  ∼⟨ cong _𝟏 (+B-left-suc b₁ b₂) ⟩
+    (suc (b₁ +B b₂)) 𝟏
+  ∎
 
-+B-right-suc : (b v : Bin) -> b +B suc v ≡ suc (b +B v)
-+B-right-suc = {! !}
++B-right-suc : (b₁ b₂ : Bin) -> b₁ +B suc b₂ ≡ suc (b₁ +B b₂)
++B-right-suc ✂ ✂ = refl
++B-right-suc ✂ (b₂ 𝟎) = refl
++B-right-suc ✂ (b₂ 𝟏) = refl
++B-right-suc (b₁ 𝟎) ✂ =
+  begin
+    (b₁ +B ✂) 𝟏
+  ∼⟨ cong _𝟏 (+B-right-end b₁) ⟩
+    b₁ 𝟏
+  ∎
++B-right-suc (b₁ 𝟎) (b₂ 𝟎) = refl
++B-right-suc (b₁ 𝟎) (b₂ 𝟏) =
+  begin
+    (b₁ +B suc b₂) 𝟎
+  ∼⟨ cong _𝟎 (+B-right-suc b₁ b₂) ⟩
+    suc (b₁ +B b₂) 𝟎
+  ∎
++B-right-suc (b₁ 𝟏) ✂ =
+  begin
+    (suc (b₁ +B ✂)) 𝟎
+  ∼⟨ cong _𝟎 (cong suc (+B-right-end b₁)) ⟩
+    (suc b₁) 𝟎
+  ∎
++B-right-suc (b₁ 𝟏) (b₂ 𝟎) = refl
++B-right-suc (b₁ 𝟏) (b₂ 𝟏) =
+  begin
+    (b₁ +B suc b₂) 𝟏
+  ∼⟨ cong _𝟏 (+B-right-suc b₁ b₂) ⟩
+    (suc (b₁ +B b₂)) 𝟏
+  ∎
 
 fromNat-+N-+B-commutes : (n m : ℕ) -> fromNat (n +N m) ≡ fromNat n +B fromNat m
 fromNat-+N-+B-commutes = {! !}
