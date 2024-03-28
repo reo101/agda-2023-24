@@ -43,8 +43,8 @@ open Helpers
 
 data Bin : Set where
   ✂  : Bin
-  _𝟎 : Bin -> Bin
-  _𝟏 : Bin -> Bin
+  _𝟎 : Bin → Bin
+  _𝟏 : Bin → Bin
 
 infixr 12 _𝟎
 infixr 12 _𝟏
@@ -52,7 +52,7 @@ infixr 12 _𝟏
 _ : Bin
 _ = ✂ 𝟏 𝟎 𝟏
 
-suc : Bin -> Bin
+suc : Bin → Bin
 suc ✂ = ✂ 𝟏
 suc (b 𝟎) = b 𝟏
 suc (b 𝟏) = suc b 𝟎
@@ -70,7 +70,7 @@ natDivTwo (ℕ.suc n) with natDivTwo n
 ...                   | m , tt = ℕ.suc m , ff
 ...                   | m , ff = m , tt
 
-toNat : Bin -> ℕ
+toNat : Bin → ℕ
 toNat ✂ = ℕ.zero
 toNat (b 𝟎) = 2 *N toNat b
 toNat (b 𝟏) = 1 +N 2 *N toNat b
@@ -87,7 +87,7 @@ _ = refl
 _ : toNat ✂ ≡ 0
 _ = refl
 
-fromNat : ℕ -> Bin
+fromNat : ℕ → Bin
 fromNat ℕ.zero = ✂
 fromNat (ℕ.suc x) = suc (fromNat x)
 
@@ -100,7 +100,7 @@ _ = refl
 _ : fromNat 8 ≡ ✂ 𝟏 𝟎 𝟎 𝟎
 _ = refl
 
-toNat-suc : (b : Bin) -> toNat (suc b) ≡ ℕ.suc (toNat b)
+toNat-suc : (b : Bin) → toNat (suc b) ≡ ℕ.suc (toNat b)
 toNat-suc ✂ = refl
 toNat-suc (b 𝟎) = refl
 toNat-suc (b 𝟏) =
@@ -124,7 +124,7 @@ toNat-suc (b 𝟏) =
     ℕ.suc (toNat (b 𝟏))
   ∎
 
-to-from-id : (n : ℕ) -> toNat (fromNat n) ≡ n
+to-from-id : (n : ℕ) → toNat (fromNat n) ≡ n
 to-from-id ℕ.zero = refl
 to-from-id (ℕ.suc n) =
   begin
@@ -137,29 +137,29 @@ to-from-id (ℕ.suc n) =
     ℕ.suc n
   ∎
 
-data LeadingOne : Bin -> Set where
+data LeadingOne : Bin → Set where
   ✂𝟏 : LeadingOne (✂ 𝟏)
-  _𝟎 : {b : Bin} -> LeadingOne b -> LeadingOne (b 𝟎)
-  _𝟏 : {b : Bin} -> LeadingOne b -> LeadingOne (b 𝟏)
+  _𝟎 : {b : Bin} → LeadingOne b → LeadingOne (b 𝟎)
+  _𝟏 : {b : Bin} → LeadingOne b → LeadingOne (b 𝟏)
 
-data Can : Bin -> Set where
+data Can : Bin → Set where
   ✂ : Can ✂
-  leadingOne : {b : Bin} -> LeadingOne b -> Can b
+  leadingOne : {b : Bin} → LeadingOne b → Can b
 
-suc-LeadingOne : {b : Bin} -> LeadingOne b -> LeadingOne (suc b)
+suc-LeadingOne : {b : Bin} → LeadingOne b → LeadingOne (suc b)
 suc-LeadingOne ✂𝟏 = ✂𝟏 𝟎
 suc-LeadingOne (lb 𝟎) = lb 𝟏
 suc-LeadingOne (lb 𝟏) = (suc-LeadingOne lb) 𝟎
 
-suc-Can : {b : Bin} -> Can b -> Can (suc b)
+suc-Can : {b : Bin} → Can b → Can (suc b)
 suc-Can ✂ = leadingOne ✂𝟏
 suc-Can (leadingOne lb) = leadingOne (suc-LeadingOne lb)
 
-fromNat-Can : (n : ℕ) -> Can (fromNat n)
+fromNat-Can : (n : ℕ) → Can (fromNat n)
 fromNat-Can ℕ.zero = ✂
 fromNat-Can (ℕ.suc n) = suc-Can (fromNat-Can n)
 
-_+B_ : Bin -> Bin -> Bin
+_+B_ : Bin → Bin → Bin
 ✂ +B b₂ = b₂
 b₁ 𝟎 +B ✂ = b₁ 𝟎
 b₁ 𝟏 +B ✂ = b₁ 𝟏
@@ -182,12 +182,12 @@ _ = refl
 _ : ✂ 𝟏 𝟏 𝟏 +B ✂ 𝟏 𝟎 𝟏 ≡ ✂ 𝟏 𝟏 𝟎 𝟎
 _ = refl
 
-+B-right-end : (b : Bin) -> b +B ✂ ≡ b
++B-right-end : (b : Bin) → b +B ✂ ≡ b
 +B-right-end ✂ = refl
 +B-right-end (b 𝟎) = refl
 +B-right-end (b 𝟏) = refl
 
-+B-left-suc : (b₁ b₂ : Bin) -> suc b₁ +B b₂ ≡ suc (b₁ +B b₂)
++B-left-suc : (b₁ b₂ : Bin) → suc b₁ +B b₂ ≡ suc (b₁ +B b₂)
 +B-left-suc ✂ ✂ = refl
 +B-left-suc ✂ (b₂ 𝟎) = refl
 +B-left-suc ✂ (b₂ 𝟏) = refl
@@ -208,7 +208,7 @@ _ = refl
     (suc (b₁ +B b₂)) 𝟏
   ∎
 
-+B-right-suc : (b₁ b₂ : Bin) -> b₁ +B suc b₂ ≡ suc (b₁ +B b₂)
++B-right-suc : (b₁ b₂ : Bin) → b₁ +B suc b₂ ≡ suc (b₁ +B b₂)
 +B-right-suc ✂ ✂ = refl
 +B-right-suc ✂ (b₂ 𝟎) = refl
 +B-right-suc ✂ (b₂ 𝟏) = refl
@@ -239,7 +239,7 @@ _ = refl
     (suc (b₁ +B b₂)) 𝟏
   ∎
 
-fromNat-+N-+B-commutes : (n m : ℕ) -> fromNat (n +N m) ≡ fromNat n +B fromNat m
+fromNat-+N-+B-commutes : (n m : ℕ) → fromNat (n +N m) ≡ fromNat n +B fromNat m
 fromNat-+N-+B-commutes ℕ.zero m = refl
 fromNat-+N-+B-commutes (ℕ.suc n) m =
   begin
@@ -250,7 +250,7 @@ fromNat-+N-+B-commutes (ℕ.suc n) m =
     suc (fromNat n) +B fromNat m
   ∎
 
-+B-same-shift : (b : Bin) -> LeadingOne b -> b +B b ≡ b 𝟎
++B-same-shift : (b : Bin) → LeadingOne b → b +B b ≡ b 𝟎
 +B-same-shift (b 𝟎) (lb 𝟎) =
   begin
     (b +B b) 𝟎
@@ -267,7 +267,7 @@ fromNat-+N-+B-commutes (ℕ.suc n) m =
     (b 𝟏) 𝟎
   ∎
 
-from-to-id-Can : (b : Bin) -> Can b -> fromNat (toNat b) ≡ b
+from-to-id-Can : (b : Bin) → Can b → fromNat (toNat b) ≡ b
 from-to-id-Can ✂ ✂ = refl
 from-to-id-Can (.✂ 𝟏) (leadingOne ✂𝟏) = refl
 from-to-id-Can (b 𝟎) (leadingOne (lb 𝟎)) =
