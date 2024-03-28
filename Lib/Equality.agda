@@ -5,8 +5,11 @@ open import Level using (Level; zero; suc)
 -- data _≡_ {A : Set} : A → A → Set where
 --   refl : {x : A} → x ≡ x
 
-data _≡_ {n : Level} {A : Set n} : A → A → Set n where
-  refl : {x : A} → x ≡ x
+-- data _≡_ {n : Level} {A : Set n} : A → A → Set n where
+--   refl : {x : A} → x ≡ x
+
+data _≡_ {n : Level} {A : Set n} (x : A) : A → Set n where
+  refl : x ≡ x
 
 infix 4 _≡_
 
