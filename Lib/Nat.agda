@@ -22,13 +22,13 @@ infixr 100 _+_
 
 {-# BUILTIN NATPLUS _+_ #-}
 
--- _≤_ : ℕ → ℕ → Set
--- zero  ≤ m     = 𝟙
--- suc n ≤ zero  = 𝟘
--- suc n ≤ suc m = n ≤ m
+_<=_ : ℕ → ℕ → Set
+zero  <= m     = 𝟙
+suc n <= zero  = 𝟘
+suc n <= suc m = n <= m
 
--- _<_ : ℕ → ℕ → Set
--- n < m = suc n ≤ m
+_<_ : ℕ → ℕ → Set
+n < m = suc n <= m
 
 -- _*_  : ℕ → ℕ → ℕ
 -- zero * y = zero

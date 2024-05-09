@@ -4,9 +4,9 @@ open import Level using (suc)
 
 open import Lib.Nat using (ℕ; _<_)
 open import Lib.One using (𝟙)
-open import Lib.Fin using (Fin; natToFin; alo)
+open import Lib.Fin using (Fin; natToFin)
 
-record Number {a} (A : Set a) : Set (lsuc a) where
+record Number {a} (A : Set a) : Set (suc a) where
   field
     Constraint : ℕ → Set a
     fromNat : (n : ℕ) {{_ : Constraint n}} → A
