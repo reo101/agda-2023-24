@@ -14,11 +14,12 @@ open import Project.Control.Monad using (Monad)
 open import Project.Postulates using (funext)
 
 record Pair (A B : Set) : Set where
+  eta-equality
   constructor _,_
   field
     fst : A
     snd : B
-open Pair
+open Pair public using (fst; snd)
 
 pairFunctor : (A : Set) → HomFunctor HASK
 pairFunctor A = record
