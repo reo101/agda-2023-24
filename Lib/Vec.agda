@@ -24,14 +24,14 @@ map f (x ∷ xs) = f x ∷ map f xs
 
 -- open import Lib.Tactics using (default)
 
-data HetVec {ℓ₁ ℓ₂} (tf : Set ℓ₁ → Set ℓ₂) :
+data HetVec {ℓ₁ ℓ₂} {tf : Set ℓ₁ → Set ℓ₂} :
             {n : ℕ} (ts : Vec (Set ℓ₁) n)  →
             Set (Level.suc (ℓ₁ Level.⊔ ℓ₂)) where
-  []  : HetVec tf []
+  []  : HetVec []
   _∷_ : ∀ {n t ts}
         (x : tf t)
-        (xs : HetVec tf {n = n} ts) →
-        HetVec tf {n = suc n} (t ∷ ts)
+        (xs : HetVec {tf = tf} {n = n} ts) →
+        HetVec {n = suc n} (t ∷ ts)
 
 Nary : {n : ℕ} (ts : Vec Set n) (rt : Set) → Set
 Nary [] rt = rt
@@ -39,14 +39,14 @@ Nary (t ∷ ts) rt = t → Nary ts rt
 
 hetmap : ∀ {ℓ₁ ℓ₂ n ts tf₁ tf₂}
          (f : {t : Set ℓ₁} → tf₁ t → tf₂ t)
-         (xs : HetVec {ℓ₁} {ℓ₂} tf₁ {n} ts) →
-         HetVec {ℓ₁} {ℓ₂} tf₂ {n} ts
+         (xs : HetVec {ℓ₁} {ℓ₂} {tf = tf₁} {n} ts) →
+         HetVec {ℓ₁} {ℓ₂} {tf = tf₂} {n} ts
 hetmap f [] = []
 hetmap f (x ∷ xs) = f x ∷ hetmap f xs
 
 hetliftmap : ∀ {ℓ₁ ℓ₂ n ts tf}
              (f : {t : Set ℓ₁} → tf t → Set ℓ₂)
-             (xs : HetVec {ℓ₁} {ℓ₂} tf {n} ts) →
+             (xs : HetVec {ℓ₁} {ℓ₂} {tf = tf} {n = n} ts) →
              Vec (Set ℓ₂) n
 hetliftmap f [] = []
 hetliftmap f (x ∷ xs) = f x ∷ hetliftmap f xs
@@ -54,7 +54,7 @@ hetliftmap f (x ∷ xs) = f x ∷ hetliftmap f xs
 applyₙ : ∀ {n ts tf rt} →
          -- ∀ {n ts} → {@(tactic default id) tf : ?} → {rt} →
          (f : Nary {n = n} (map tf ts) rt) →
-         (xs : HetVec tf ts) →
+         (xs : HetVec {tf = tf} ts) →
          rt
 applyₙ f []       = f
 applyₙ f (x ∷ xs) = applyₙ (f x) xs
@@ -65,8 +65,8 @@ congₙ : {n : ℕ}
         {ts : Vec Set n}
         {rt : Set}
         (f : Nary (map id ts) rt)
-        (argss : HetVec (λ t → Pair t t) ts)
-        (args≡s : HetVec id (hetliftmap (λ {t} (t₁ , t₂) → t₁ ≡ t₂) argss)) →
+        (argss : HetVec {tf = (λ t → Pair t t)} ts)
+        (args≡s : HetVec {tf = id} (hetliftmap (λ {t} (t₁ , t₂) → t₁ ≡ t₂) argss)) →
         applyₙ f (hetmap fst argss) ≡ applyₙ f (hetmap snd argss)
 congₙ f [] [] = refl
 -- congₙ {ts = t ∷ ts} f ((arg₁ , arg₂) ∷ argss) (refl ∷ args≡s) = congₙ {ts = ts} (f arg₁) argss args≡s
@@ -81,7 +81,7 @@ module _ where
   proba₁ : ℕ
   proba₁ = applyₙ {tf = id} _+_ (1 ∷ 2 ∷ [])
 
-  proba₂ : HetVec id (ℕ ∷ ℕ ∷ [])
+  proba₂ : HetVec {tf = id} (ℕ ∷ ℕ ∷ [])
   proba₂ = hetmap {tf₁ = λ t → Pair t t} fst (1 , 2 ∷ 2 , 3 ∷ [])
 
   proba₃ : 2 + 3 ≡ (1 + 1) + (1 + 1 + 1)
