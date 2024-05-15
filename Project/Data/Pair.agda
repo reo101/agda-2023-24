@@ -19,6 +19,7 @@ record Pair (A B : Set) : Set where
   field
     fst : A
     snd : B
+infixr 21 _,_
 open Pair public using (fst; snd)
 
 pairFunctor : (A : Set) → HomFunctor HASK

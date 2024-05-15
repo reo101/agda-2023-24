@@ -12,7 +12,7 @@ open module ≡-Reasoning {n} {A} =
 
 import Level
 
-infixr 19 _∷_
+infixr 20 _∷_
 
 data Vec {ℓ} (A : Set ℓ) : ℕ → Set ℓ where
   []  : Vec A 0
@@ -70,12 +70,11 @@ congₙ : {n : ℕ}
         applyₙ f (hetmap fst argss) ≡ applyₙ f (hetmap snd argss)
 congₙ f [] [] = refl
 -- congₙ {ts = t ∷ ts} f ((arg₁ , arg₂) ∷ argss) (refl ∷ args≡s) = congₙ {ts = ts} (f arg₁) argss args≡s
-congₙ {ts = t ∷ ts}
-      f
+congₙ f
       ((arg₁ , arg₂) ∷ argss)
       (args≡ ∷ args≡s)
       with args≡
-... | refl = congₙ {ts = ts} (f arg₁) argss args≡s
+... | refl = congₙ (f arg₁) argss args≡s
 
 module _ where
   proba₁ : ℕ
@@ -86,3 +85,11 @@ module _ where
 
   proba₃ : 2 + 3 ≡ (1 + 1) + (1 + 1 + 1)
   proba₃ = congₙ _+_ ((2 , (1 + 1)) ∷ (3 , (1 + 1 + 1)) ∷ []) (refl ∷ refl ∷ [])
+
+  data Kek : Set where
+    nula : Kek
+    1+_ : Kek → Kek
+
+  _ : Kek
+  _ = 1+ 1+ 1+ nula
+
