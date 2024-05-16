@@ -111,9 +111,9 @@ _ = α ∷ β ∷ γ ∷ []
 
 data _In_ : Type → Context → Set where
   -- here
-  Z : {ty : Type} {ctx : Context} → ty In (ty ∷ ctx)
+  Z : {τ : Type} {Γ : Context} → τ In (τ ∷ Γ)
   -- there
-  S_ : {ty1 ty2 : Type} {ctx : Context} → ty1 In ctx → ty1 In (ty2 ∷ ctx)
+  S_ : {τ₁ τ₂ : Type} {Γ : Context} → τ₁ In Γ → τ₁ In (τ₂ ∷ Γ)
 
 infixr 12 S_
 
@@ -280,7 +280,7 @@ _ = lam (lam (lam (app (app (var (S S Z)) (var Z))
 -- Since our variables are membership proofs(In), this means that we're
 -- effectively renaming each variable, hence the name of this type synonym.
 Ren : Context → Context → Set
-Ren γ δ = {τ : Type} → τ In γ → τ In δ
+Ren Γ Δ = {τ : Type} → τ In Γ → τ In Δ
 
 _»_ = Ren
 
@@ -346,7 +346,7 @@ rename {Γ} {Δ} ρ {τ₁ ⇒ τ₂} (lam ΛΓτ) = lam (rename (extRen {σ = �
 -- Λ (β ∷ β ∷ β ∷ α ∷ []) α
 -- Agda does not like this, since it can't figure out what the context should be,
 -- so we need to manually specify it.
-withContext : {τ : Type} (γ : Context) → Λ γ τ → Λ γ τ
+withContext : {τ : Type} (Γ : Context) → Λ Γ τ → Λ Γ τ
 withContext _ x = x
 
 -- NOTE
