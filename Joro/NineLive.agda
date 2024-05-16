@@ -1,4 +1,5 @@
 {-# OPTIONS --inversion-max-depth=5000 #-}
+-- {-# OPTIONS --backtracking-instance-search #-}
 
 module Joro.NineLive where
 
@@ -13,7 +14,7 @@ open import Lib.Sigma using (Σ; _*_) renaming (_,_ to _,σ_)
 open import Lib.Decidable using (Dec; no; yes)
 open import Lib.List using (List; []; _∷_; length)
 open import Lib.Vec using (Vec; HetVec; []; _∷_; congₙ)
-open import Project.Data.Pair using (Pair; _,_; fst; snd)
+open import Project.Data.Pair using (Pair; fst; snd) renaming (_,_ to _,,_)
 open import Project.Control.Equality using (_≡_; refl; sym; cong; cong-app; trans; subst; ≡-equiv)
 open import Project.EquationalReasoning as EquationalReasoning
 open module ≡-Reasoning {n} {A} =
@@ -49,7 +50,7 @@ base x ≣T≣ (τ₂ ⇒ τ₃) = 𝟘
 
 ≣T≣⇒≡ : {τ₁ τ₂ : Type} → τ₁ ≣T≣ τ₂ → τ₁ ≡ τ₂
 ≣T≣⇒≡ {base n₁} {base n₂} p = cong base (≣ℕ≣⇒≡ p)
-≣T≣⇒≡ {τ₁ ⇒ τ₂} {τ₃ ⇒ τ₄} (τ₁≣T≣τ₃ , τ₂≣T≣τ₄) =
+≣T≣⇒≡ {τ₁ ⇒ τ₂} {τ₃ ⇒ τ₄} (τ₁≣T≣τ₃ ,, τ₂≣T≣τ₄) =
   begin
     τ₁ ⇒ τ₂
   ∼⟨ cong (τ₁ ⇒_) (≣T≣⇒≡ τ₂≣T≣τ₄) ⟩
@@ -214,6 +215,12 @@ instance
     -- with τ✓
   ... | refl = ixIn k Γ k<#Γ
 
+  NumΛ : ∀ {τ Γ} → Number (Λ Γ τ)
+  Number.Constraint (NumΛ {τ} {Γ}) = NumIn-Constraint
+    where open Number (NumIn {τ} {Γ}) using () renaming (Constraint to NumIn-Constraint)
+  Number.fromNat (NumΛ {τ} {Γ}) k {{p}} = var (NumIn-fromNat k {{p}})
+    where open Number (NumIn {τ} {Γ}) using () renaming (fromNat to NumIn-fromNat)
+
 _ : Σ (Lt 0 (length (base 0 ∷ []))) λ k<#Γ → ix 0 (base 0 ∷ []) k<#Γ ≣T≣ base 0
 _ = _
 
@@ -228,7 +235,7 @@ _ = _
 -- fromNat′ : {A : Set} {num : Number A} (n : ℕ) {c : Number.Constraint num n} → A
 -- fromNat′ {A} {num} n {c} = fromNat {A = A} {{r = num}} n {{c}}
 
-instance
+-- instance
   -- mqu : (α In α ∷ [])
   -- mqu = NumIn {τ = α} {Γ = α ∷ []}
   -- mqu : ∀ {τ Γ k} → {k<#Γ : Lt k (length Γ)} → ix k Γ k<#Γ ≡ τ
@@ -254,7 +261,7 @@ _ = ` 1
 -- TASK
 -- Write the identity function term, i.e. λx.x
 _ : Λ [] (α ⇒ α)
-_ = lam (var Z)
+_ = lam (fromNat 0 {{_}})
 
 -- TASK
 -- Write the "const" function, i.e. λx.λy.x
@@ -266,7 +273,7 @@ _ = lam (lam (var (S Z)))
 _ : Λ [] ((α ⇒ β ⇒ γ) ⇒ (α ⇒ β) ⇒ α ⇒ γ)
 _ = lam (lam (lam (app (app (var (S S Z)) (var Z))
                        (app (var (S Z))   (var Z)))))
-{-
+
 -- NOTE
 -- A renaming is a way for us to send any type in one context to another context.
 --
@@ -275,15 +282,21 @@ _ = lam (lam (lam (app (app (var (S S Z)) (var Z))
 Ren : Context → Context → Set
 Ren γ δ = {τ : Type} → τ In γ → τ In δ
 
+_»_ = Ren
+
+infix 19 _»_
+
 -- TASK
 -- The identity renaming, does nothing.
 idRename : {γ : Context} → Ren γ γ
-idRename = ?
+idRename Z = Z
+idRename (S x) = S x
 
 -- TASK
 -- A renaming that "shifts" all the variables "up by one".
-shift1Rename : {γ : Context} {sigma : Type} → Ren γ (γ ∷ sigma)
-shift1Rename = ?
+shift1Rename : {Γ : Context} {σ : Type} → Ren Γ (σ ∷ Γ)
+shift1Rename Z = S Z
+shift1Rename (S x) = S shift1Rename x
 
 -- TASK
 -- We can "extend" renamings
@@ -298,22 +311,25 @@ shift1Rename = ?
 -- when we apply this for lambdas, the newly introduced variable will be a *bound* variable,
 -- and we want our renaming to not affect it.
 extRen :
-  {sigma : Type} {γ δ : Context} →
-  Ren γ δ →
-  Ren (γ ∷ sigma) (δ ∷ sigma)
-extRen = ?
+  {σ : Type} {Γ Δ : Context} →
+  Γ » Δ →
+  σ ∷ Γ » σ ∷ Δ
+extRen {σ} {Γ} {Δ} Γ»Δ {.σ} Z = Z
+extRen {σ} {Γ} {Δ} Γ»Δ {τ} (S τInσ∷Γ) = S Γ»Δ τInσ∷Γ
 
 -- TASK
 -- Applying/lifting a renaming to a term
 rename :
-  {γ δ : Context} →
+  {Γ Δ : Context} →
   -- if we have a renaming ρ
-  Ren γ δ →
+  Γ » Δ →
   -- and we have a typed term in the domain of that ρ
-  {τ : Type} → Λ γ τ →
+  {τ : Type} → Λ Γ τ →
   -- then we can rename all the variables by using ρ while preserving the type of the term
-  Λ δ τ
-rename = ?
+  Λ Δ τ
+rename {Γ} {Δ} ρ {τ} (var p) = var (ρ p)
+rename {Γ} {Δ} ρ {τ} (app {σ₁ = σ} {σ₂ = τ} ΛΓσ⇒τ ΛΓτ) = app (rename ρ ΛΓσ⇒τ) (rename ρ ΛΓτ)
+rename {Γ} {Δ} ρ {τ₁ ⇒ τ₂} (lam ΛΓτ) = lam (rename (extRen {σ = τ₁} ρ) ΛΓτ)
 
 -- NOTE
 -- tl;dr Again, as with untyped Lams, we need to explicitly specify what our context is
@@ -352,30 +368,30 @@ _ = [ base 2 , (base 1 ⇒ base 2) , base 1 ]
 -- (it could be any base n, for whatever n you pick)
 --
 -- Our id renaming should do nothing
-_ : withContext [ base 5 ] (rename idRename (` 0)) == ` 0
+_ : withContext [ base 5 ] (rename idRename (` 0)) ≡ ` 0
 _ = refl
 
-_ : withContext [] (rename idRename (lam {[]} {α} {α} (` 0))) == lam (` 0)
+_ : withContext [] (rename idRename (lam {[]} {α} {α} (` 0))) ≡ lam (` 0)
 _ = refl
 
 -- Our shift renaming should.. shift
 _ :
-  withContext [ base 42 , base 69 ]
+  withContext [ base 69 , base 42 ]
     (rename shift1Rename
       (withContext [ base 42 ] (` 0)))
-  ==
+  ≡
   ` 1
 _ = refl
 
 -- but it should take care not to touch bound variables
 _ :
-  withContext [ base 42 , base 69 ]
+  withContext [ base 69 , base 42 ]
     (rename shift1Rename
       (withContext [ base 42 ]
         (app
           (lam {_} {base 42} (` 0))
           (` 0))))
-  ==
+  ≡
   app (lam (` 0)) (` 1)
 _ = refl
 
@@ -386,12 +402,16 @@ _ = refl
 -- Since our variables are membership proofs(In), this means that we're
 -- effectively substituting each variable for a term.
 Subst : Context → Context → Set
-Subst γ δ = {τ : Type} → τ In γ → Λ δ τ
+Subst Γ Δ = {τ : Type} → τ In Γ → Λ Δ τ
+
+_↦_ = Subst
+
+infix 19 _↦_
 
 -- TASK
 -- The substitution that replaces all variables with themselves.
-idSubst : {γ : Context} → Subst γ γ
-idSubst = ?
+idSubst : {Γ : Context} → Subst Γ Γ
+idSubst x = var x
 
 -- TASK
 -- Once again, as with renamings, we can "extend" substitutions
@@ -405,35 +425,37 @@ idSubst = ?
 -- when we apply this for lambdas, the newly introduced variable will be a *bound* variable,
 -- and we want our substitution to not affect it.
 extSubst :
-  {γ δ : Context} {sigma : Type} →
-  Subst γ δ →
-  Subst (γ ∷ sigma) (δ ∷ sigma)
-extSubst = ?
+  {Γ Δ : Context} {σ : Type} →
+  Γ ↦ Δ →
+  σ ∷ Γ ↦ σ ∷ Δ
+extSubst {Γ} {Δ} {σ} s {.σ} Z = var Z
+extSubst {Γ} {Δ} {σ} s {τ} (S p) = rename shift1Rename (s p)
 
 -- TASK
 -- We can apply/extend substitutions to terms
-subst :
-  {γ δ : Context} {τ : Type} →
+applySubst :
+  {Γ Δ : Context} {τ : Type} →
   -- if we have a substitution θ
-  Subst γ δ →
+  Γ ↦ Δ →
   -- and we have a typed term whose variables are all in the domain of θ
-  Λ γ τ →
+  Λ Γ τ →
   -- then we can apply θ to get a new term of the same type
-  Λ δ τ
-subst = ?
+  Λ Δ τ
+applySubst {Γ} {Δ} {τ} θ (var p) = θ p
+applySubst {Γ} {Δ} {τ} θ (app l₁ l₂) = app (applySubst θ l₁) (applySubst θ l₂)
+applySubst {Γ} {Δ} {τ₁ ⇒ τ₂} θ (lam l) = lam (applySubst (extSubst {σ = τ₁} θ) l)
 
 -- NOTE
 -- A "pretty" synonym for subst, somewhat mimicking some usual mathematical syntax
 -- for applying substitutions.
 _[_] :
-  {γ δ : Context} {τ : Type} →
-  Λ γ τ →
-  Subst γ δ →
-  Λ δ τ
-x [ th ] = subst th x
+  {Γ Δ : Context} {τ : Type} →
+  Λ Γ τ →
+  Γ ↦ Δ →
+  Λ Δ τ
+x [ th ] = applySubst th x
 
 infix 10 _[_]
 
 -- UNIT TESTS
 -- Write some unit tests yourselves :P
--}
