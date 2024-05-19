@@ -16,10 +16,10 @@ record Monad (ℂ : Category {o} {ℓ} {e}) : Set (o ⊔ ℓ ⊔ e) where
     η : Idᶠ ℂ ~> F
     μ : F ² ~> F
 
-  private module ℂ = Category ℂ
-  private module F = Functor F
-  private module η = NaturalTransformation η
-  private module μ = NaturalTransformation μ
+  module ℂ = Category ℂ
+  module F = Functor F
+  module η = NaturalTransformation η
+  module μ = NaturalTransformation μ
 
   ------------
   --- LAWS ---

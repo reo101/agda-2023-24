@@ -4,10 +4,11 @@ open import Level using (Level; _⊔_; suc)
 
 open import Project.Relations using (EquivalenceRelation)
 
-variable
-  n m   : Level
-  A     : Set n
-  x y z : A
+private
+  variable
+    n m   : Level
+    A     : Set n
+    x y z : A
 
 module Core (_∼_ : A → A → Set m) {{∼-equiv : EquivalenceRelation _∼_}} where
 
