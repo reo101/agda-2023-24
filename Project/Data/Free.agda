@@ -120,6 +120,13 @@ module FreeTakiva (F : HomFunctor HASK) where
     ; μη-identity = {! !}
     }
 
+liftF : {F : HomFunctor HASK} {A : Set} →
+        let private module F = Functor F
+        in F [ A ] → Free F A
+liftF {F} = impure ∘ (F [fmap pure ])
+  where
+    module F = Functor F
+
 open FreeTakiva public using (freeFunctor; freeMonad)
 
 module _ where
@@ -135,9 +142,6 @@ module _ where
   --   ; identity = {! !}
   --   ; homomorphism = {! !}
   --   ; F-resp-≈ = {! !} }
-
-  State : Set → Set → Set
-  State = Free ∘ StateF
 
   _>>=_ : {{m : Monad HASK}} →
           let open Monad m using (F)
@@ -159,13 +163,22 @@ module _ where
     where
       open Monad m using (F; μ)
 
-  open import Lib.Nat using (ℕ; _+_)
+  getF : StateF S [ S ]
+  getF = λ s → s , s
+
+  putF : S → StateF S [ 𝟙 ]
+  putF s = const (s , ⟨⟩)
+
+  State : Set → Set → Set
+  State = Free ∘ StateF
 
   get : State S S
-  get = impure λ { s → s , pure s }
+  get = liftF getF
 
   set : S → State S 𝟙
-  set s = impure λ { s′ → s , pure ⟨⟩ }
+  set = liftF ∘ putF
+
+  open import Lib.Nat using (ℕ; _+_)
 
   kek : State ℕ ℕ
   kek = do
