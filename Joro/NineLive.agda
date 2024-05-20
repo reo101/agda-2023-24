@@ -14,6 +14,7 @@ open import Lib.Sigma using (Σ; _*_) renaming (_,_ to _,σ_)
 open import Lib.Decidable using (Dec; no; yes)
 open import Lib.List using (List; []; _∷_; length)
 open import Lib.Vec using (Vec; HetVec; []; _∷_; congₙ)
+open import Lib.Utils using (id)
 open import Project.Data.Pair using (Pair; fst; snd) renaming (_,_ to _,,_)
 open import Project.Control.Equality using (_≡_; refl; sym; cong; cong-app; trans; subst; ≡-equiv)
 open import Project.EquationalReasoning as EquationalReasoning
@@ -289,14 +290,12 @@ infix 19 _»_
 -- TASK
 -- The identity renaming, does nothing.
 idRename : {γ : Context} → Ren γ γ
-idRename Z = Z
-idRename (S x) = S x
+idRename = id
 
 -- TASK
 -- A renaming that "shifts" all the variables "up by one".
 shift1Rename : {Γ : Context} {σ : Type} → Ren Γ (σ ∷ Γ)
-shift1Rename Z = S Z
-shift1Rename (S x) = S shift1Rename x
+shift1Rename = S_
 
 -- TASK
 -- We can "extend" renamings
@@ -315,7 +314,7 @@ extRen :
   Γ » Δ →
   σ ∷ Γ » σ ∷ Δ
 extRen {σ} {Γ} {Δ} Γ»Δ {.σ} Z = Z
-extRen {σ} {Γ} {Δ} Γ»Δ {τ} (S τInσ∷Γ) = S Γ»Δ τInσ∷Γ
+extRen {σ} {Γ} {Δ} Γ»Δ {τ} (S τInσ∷Γ) = shift1Rename (Γ»Δ τInσ∷Γ)
 
 -- TASK
 -- Applying/lifting a renaming to a term
