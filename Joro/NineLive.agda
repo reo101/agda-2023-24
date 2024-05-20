@@ -348,18 +348,18 @@ rename {Γ} {Δ} ρ {τ₁ ⇒ τ₂} (lam ΛΓτ) = lam (rename (extRen {σ = �
 withContext : {τ : Type} (Γ : Context) → Λ Γ τ → Λ Γ τ
 withContext _ x = x
 
--- NOTE
--- Convenience synonyms for small contexts
-pattern [_] x = x ∷ []
-pattern [_,_] x y = x ∷ y ∷ []
-pattern [_,_,_] x y z = x ∷ y ∷ z ∷ []
-
--- for example
-_ : Context
-_ = [ base 1 ]
-
-_ : Context
-_ = [ base 2 , (base 1 ⇒ base 2) , base 1 ]
+-- -- NOTE
+-- -- Convenience synonyms for small contexts
+-- pattern [_] x = x ∷ []
+-- pattern [_,_] x y = x ∷ y ∷ []
+-- pattern [_,_,_] x y z = x ∷ y ∷ z ∷ []
+--
+-- -- for example
+-- _ : Context
+-- _ = [ base 1 ]
+--
+-- _ : Context
+-- _ = [ base 2 , (base 1 ⇒ base 2) , base 1 ]
 
 -- UNIT TESTS
 -- Note that you might (unfortunately) also have to specify implicit args to internal lambdas here,
@@ -367,7 +367,7 @@ _ = [ base 2 , (base 1 ⇒ base 2) , base 1 ]
 -- (it could be any base n, for whatever n you pick)
 --
 -- Our id renaming should do nothing
-_ : withContext [ base 5 ] (rename idRename (` 0)) ≡ ` 0
+_ : withContext (base 5 ∷ []) (rename idRename (` 0)) ≡ ` 0
 _ = refl
 
 _ : withContext [] (rename idRename (lam {[]} {α} {α} (` 0))) ≡ lam (` 0)
@@ -375,18 +375,18 @@ _ = refl
 
 -- Our shift renaming should.. shift
 _ :
-  withContext [ base 69 , base 42 ]
+  withContext (base 69 ∷ base 42 ∷ [])
     (rename shift1Rename
-      (withContext [ base 42 ] (` 0)))
+      (withContext (base 42 ∷ []) (` 0)))
   ≡
   ` 1
 _ = refl
 
 -- but it should take care not to touch bound variables
 _ :
-  withContext [ base 69 , base 42 ]
+  withContext (base 69 ∷ base 42 ∷ [])
     (rename shift1Rename
-      (withContext [ base 42 ]
+      (withContext (base 42 ∷ [])
         (app
           (lam {_} {base 42} (` 0))
           (` 0))))
@@ -458,3 +458,24 @@ infix 10 _[_]
 
 -- UNIT TESTS
 -- Write some unit tests yourselves :P
+
+_ :
+  withContext []
+    (lam {σ₁ = α} (` 0) [ idSubst ])
+  ≡
+  lam (` 0)
+_ = refl
+
+-- NOTE: from <https://github.com/reo101/LCPT/blob/fa99caf54f8249d03de02ae9d432d20f5bfcc017/Implementations/Haskell/tasks.hs#L168-L169>
+--
+-- >>> csub ("x", Abs "x" (Var "z")) $ Abs "y" (Var "x")
+-- Abs "x1" (Abs "x" (Var "z"))
+
+_ :
+  withContext (β ∷ [])
+    ((withContext ((α ⇒ β) ∷ [])
+       (lam {σ₁ = γ} (` 1)))
+     [ (λ { Z → lam (` 1) }) ])
+  ≡
+  (lam (lam (` 2)))
+_ = refl
