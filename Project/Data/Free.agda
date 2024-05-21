@@ -173,7 +173,7 @@ module FreeTakiva (F : HomFunctor HASK) where
       }
     ; μμ-associative = μμ-associative
     ; μη-associative = μη-associative
-    ; μη-identity = {! !}
+    ; μη-identity = refl
     }
 
 liftF : {F : HomFunctor HASK} {A : Set} →
