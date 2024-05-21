@@ -12,7 +12,7 @@ open module ≡-Reasoning {n} {A} =
 open import Project.Control.Categories using (Category; _[_,_]; _[_≈_]; _[_∘_]; HASK)
 module HASK = Category HASK
 open import Project.Control.Functor using (Functor; HomFunctor; _[_]; _[fmap_]; _∘ᶠ_) renaming (Id to Idᶠ)
-open import Project.Control.Monad using (Monad)
+open import Project.Control.Monad using (Monad; _>>=_; _>>_)
 open import Project.Control.NaturalTransformation using (NaturalTransformation; _~>_; _∘ₕ_) renaming (Id to Idⁿ)
 open import Project.Data.Reader using (Reader; readerFunctor)
 open import Project.Data.Pair using (Pair; pairFunctor; _,_)
@@ -158,26 +158,6 @@ module _ where
   --   ; identity = {! !}
   --   ; homomorphism = {! !}
   --   ; F-resp-≈ = {! !} }
-
-  _>>=_ : {{m : Monad HASK}} →
-          let open Monad m using (F)
-          in
-          F [ A ] →
-          (A → F [ B ]) →
-          F [ B ]
-  _>>=_ {B = B} {{m}} mx f = μ.component B ((F [fmap f ]) mx)
-    where
-      open Monad m using (F; μ)
-
-  _>>_ : {{m : Monad HASK}} →
-         let open Monad m using (F)
-         in
-         F [ A ] →
-         F [ B ] →
-         F [ B ]
-  _>>_ {B = B} {{m}} mx my = μ.component B ((F [fmap const my ]) mx)
-    where
-      open Monad m using (F; μ)
 
   getF : StateF S [ S ]
   getF = λ s → s , s
