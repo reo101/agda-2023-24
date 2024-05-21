@@ -140,6 +140,26 @@ module FreeTakiva (F : HomFunctor HASK) where
       ∎
     }
 
+  {-# TERMINATING #-}
+  μη-associative : {X : Set} → id ≡ μ {X} ∘ freeFmap pure
+  μη-associative {X} = funext λ
+    { (pure x) → refl
+    ; (impure x) →
+      begin
+        id (impure x)
+      ∼⟨⟩
+        impure (id x)
+      ∼⟨ cong impure (cong-app (symmetric F.identity) x) ⟩
+        impure ((F [fmap id ]) x)
+      ∼⟨ cong impure (cong-app (cong (F [fmap_]) (μη-associative {X})) x) ⟩
+        impure ((F [fmap μ ∘ freeFmap pure ]) x)
+      ∼⟨ cong impure (cong-app F.homomorphism x) ⟩
+        impure (((F [fmap μ ]) ∘ (F [fmap freeFmap pure ])) x)
+      ∼⟨⟩
+        (μ ∘ freeFmap pure) (impure x)
+      ∎
+    }
+
   freeMonad : Monad HASK
   freeMonad = record
     { F = freeFunctor
@@ -152,7 +172,7 @@ module FreeTakiva (F : HomFunctor HASK) where
       ; commutativity = μ-commutativity
       }
     ; μμ-associative = μμ-associative
-    ; μη-associative = {! !}
+    ; μη-associative = μη-associative
     ; μη-identity = {! !}
     }
 
