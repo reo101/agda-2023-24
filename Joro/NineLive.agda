@@ -33,6 +33,8 @@ data Type : Set where
   base : ℕ → Type
   _⇒_ : Type → Type → Type
 
+infixr 21 _⇒_
+
 _≣ℕ≣_ : ℕ → ℕ → Set
 zero ≣ℕ≣ zero = 𝟙
 zero ≣ℕ≣ suc y = 𝟘
@@ -73,8 +75,6 @@ base x ≣T≣ (τ₂ ⇒ τ₃) = 𝟘
 
 δ : Type
 δ = base 3
-
-infixr 11 _⇒_
 
 -- λx.λy.x
 -- const :: a → b → a
@@ -236,7 +236,9 @@ _ = _
 -- fromNat′ : {A : Set} {num : Number A} (n : ℕ) {c : Number.Constraint num n} → A
 -- fromNat′ {A} {num} n {c} = fromNat {A = A} {{r = num}} n {{c}}
 
--- instance
+instance
+  mqu : ∀ {τ Γ k} → {k<#Γ : Lt k (length Γ)} → {ix k Γ k<#Γ ≣T≣ τ} → Σ (Lt k (length Γ)) λ k<#Γ → ix k Γ k<#Γ ≣T≣ τ
+  mqu {τ} {Γ} {k} {k<#Γ} {p} = k<#Γ ,σ p
   -- mqu : (α In α ∷ [])
   -- mqu = NumIn {τ = α} {Γ = α ∷ []}
   -- mqu : ∀ {τ Γ k} → {k<#Γ : Lt k (length Γ)} → ix k Γ k<#Γ ≡ τ
@@ -247,6 +249,10 @@ _ = _
   --     τ
   --   ∎
   -- mqu {τ} {τ′ ∷ Γ} {suc k} {k<#Γ} = {! !}
+
+
+_ : Λ (γ ∷ α ∷ β ∷ []) α
+_ = fromNat 1 {{_}}
 
 _ : α In (α ∷ [])
 _ = fromNat 0 {{⟨⟩ ,σ ⟨⟩}}
