@@ -235,6 +235,8 @@ N β∎ = =β>*-refl
 
 infix 3 _β∎
 
+{-# DISPLAY =β>*-refl {l = N} = N β∎ #-}
+
 -- TASK
 -- Synonym for transitvity, to allow us to chain proofs, much like we used _=[_]_
 _⇒⟨_⟩_ :
@@ -247,6 +249,8 @@ _⇒⟨_⟩_ :
 N ⇒⟨ p ⟩ q = =β>*-cons p q
 
 infixr 2 _⇒⟨_⟩_
+
+{-# DISPLAY =β>*-cons {l₁ = N} p q = N ⇒⟨ p ⟩ q #-}
 
 _⇒⟨⟩_ :
   {Γ : Context} {τ : Type} →
@@ -343,25 +347,14 @@ progress (app M N) with progress M
 ... | progress-val (v-lam M′) with progress N
 ...                                 | progress-val (v-lam N′) =
   progress-step (M′ [0⇒ lam N′ ]) (red-β (v-lam N′)) (progress (M′ [0⇒ lam N′ ]))
-  -- progress-step (app M′ N) (red-app-l M=β>M′) (progress (app M′ N))
 ...                                 | progress-step N′ N=β>N′ pn =
   progress-step (app M N′) (red-app-r (v-lam M′) N=β>N′) (progress (app M N′))
--- -- ... | progress-val (v-lam m) | progress-step N′ N=β>N′ pn =
--- --   progress-step (app M B′) (red-app-r (v-lam m) N=β>N′) (progress (app < N′))
--- ... | progress-step M′ M=β>M′ pm with progress N
--- ...                                 | progress-val vm =
---   progress-step (app M′ N) (red-app-l M=β>M′) (progress (app M′ N))
--- ...                                 | progress-step N′ N=β>N′ pn =
---   progress-step (app M′ N) (red-app-l M=β>M′)
---     (progress-step (app M′ N′) (red-app-r {!  !} N=β>N′)
---       {! (progress (app M′ N′)) !})
 progress (lam N) = progress-val (v-lam N)
 
 -- TASK
 -- Implement a function which determines if a given term is a value by using progress.
 decVal : {τ : Type} → (N : Λ [] τ) → Dec (Val N)
 decVal (app M N) = no (λ ())
--- FIXME:             VVVVVVV      `Val` is not correct??
 decVal (lam N) = yes (v-lam N)
 
 -- data Maybe (A : Set) : Set where
