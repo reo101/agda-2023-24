@@ -176,14 +176,14 @@ module FreeTakiva (F : HomFunctor HASK) where
     ; μη-identity = refl
     }
 
+open FreeTakiva public using (freeFunctor; freeMonad)
+
 liftF : {F : HomFunctor HASK} {A : Set} →
         let private module F = Functor F
         in F [ A ] → Free F A
 liftF {F} = impure ∘ (F [fmap pure ])
   where
     module F = Functor F
-
-open FreeTakiva public using (freeFunctor; freeMonad)
 
 module _ where
   private
@@ -192,12 +192,6 @@ module _ where
 
   StateF : (S : Set) → HomFunctor HASK
   StateF S = readerFunctor S ∘ᶠ pairFunctor S
-  -- StateF S = record
-  --   { F[_] = λ { A → (S → Pair S A) }
-  --   ; fmap = {! !}
-  --   ; identity = {! !}
-  --   ; homomorphism = {! !}
-  --   ; F-resp-≈ = {! !} }
 
   getF : StateF S [ S ]
   getF = λ s → s , s
@@ -226,7 +220,7 @@ module _ where
         _ : Monad HASK
         _ = freeMonad (StateF ℕ)
 
-  runState : State S A → S → Pair S A
+  runState : State S A → Reader S (Pair S A)
   runState (pure x) s = s , x
   runState (impure f) s =
     let s′ , b = f s
