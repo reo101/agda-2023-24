@@ -18,3 +18,7 @@ natToFin {zero}  zero    {()}
 natToFin {zero}  (suc m) {()}
 natToFin {suc n} zero    {⟨⟩} = zero
 natToFin {suc n} (suc m) {pr} = suc (natToFin m {pr})
+
+finToNat : {n : ℕ} → Fin n → ℕ
+finToNat zero = zero
+finToNat (suc n) = suc (finToNat n)
