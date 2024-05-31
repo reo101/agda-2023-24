@@ -4,7 +4,6 @@ depend:
 include:
   .
 flags:
-  --cubical
   --prop
   --erasure
   --allow-unsolved-metas
