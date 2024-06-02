@@ -456,10 +456,10 @@ map-compose f g (x ∷ xs) = cong (g (f x) ∷_) (map-compose f g xs)
 -- TASK
 -- The List type constructor is a functor, in the same way that Maybe is a functor.
 LIST : AGDA => AGDA
-F-Obj LIST x = x
-F-map LIST f x = f x
-F-map-id LIST x = refl
-F-map-comp LIST f g = refl
+F-Obj LIST A = List A
+F-map LIST f xs = map f xs
+F-map-id LIST A = funext map-id
+F-map-comp LIST f g = funext (map-compose f g)
 
 -- TASK
 -- Addition with the constant k forms a functor over the preorder ℕ category
