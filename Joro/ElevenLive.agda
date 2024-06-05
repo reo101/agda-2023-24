@@ -565,13 +565,13 @@ module FreeCat (X : Set) (R : X → X → Set) where
   -- category, to figure out what exactly you need.
   data Free : X → X → Set where
     free-id : {x : X} → Free x x
-    free-comp : {x y z : X} → Free x y → Free y z → Free x z
-    free-real : {x y : X} → R x y → Free x y
+    free-comp : {x y z : X} → R x y → Free y z → Free x z
 
   -- TASK
   -- Since Free will form the arrows for our category, we will of course also need a way to compose Frees
   compFree : {x y z : X} → Free x y → Free y z → Free x z
-  compFree = free-comp
+  compFree free-id f₂ = f₂
+  compFree (free-comp r f₁) f₂ = free-comp r (compFree f₁ f₂)
 
   -- TASK
   -- Implement the free category over X and R by using Free and compFree
@@ -579,12 +579,12 @@ module FreeCat (X : Set) (R : X → X → Set) where
   Obj FREE = X
   Arr FREE = Free
   idArr FREE = free-id
-  comp FREE = free-comp
-  idArr-comp FREE free-id = {! !}
-  idArr-comp FREE (free-comp f₁ f₂) = {! !}
-  idArr-comp FREE (free-real r) = {! !}
-  comp-idArr FREE = {! !}
-  assoc FREE = {! !}
+  comp FREE = compFree
+  idArr-comp FREE f = refl
+  comp-idArr FREE free-id = refl
+  comp-idArr FREE (free-comp r f) = cong (free-comp r) (comp-idArr FREE f)
+  assoc FREE free-id g h = refl
+  assoc FREE (free-comp r f) g h = cong (free-comp r) (assoc FREE f g h)
 
 module Finite where
   -- TASK
