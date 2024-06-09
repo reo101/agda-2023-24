@@ -151,20 +151,20 @@ _∨_≡nandOr = funext λ { tt → funext λ { tt → refl
 --   1. a "true" value
 --   2. the NAND of two NandExprs
 data NandExpr : Set where
-  しんじつ : NandExpr
+  本物 : NandExpr
   NandNand : NandExpr → NandExpr → NandExpr
 
 -- TASK
 -- Execute a NandExpr
 interpNand : NandExpr → 𝟚
-interpNand しんじつ = tt
+interpNand 本物 = tt
 interpNand (NandNand b1 b2) = nand𝟚 (interpNand b1) (interpNand b2)
 
 -- TASK
 -- Transpile a PropExpr to a NandExpr
 
 NandFf : NandExpr
-NandFf = NandNand しんじつ しんじつ
+NandFf = NandNand 本物 本物
 
 ff≡NandFf : ff ≡ interpNand NandFf
 ff≡NandFf = refl
@@ -173,7 +173,7 @@ NandNot : NandExpr → NandExpr
 NandNot b = NandNand b b
 
 -- not≡NandNot : (b1 : NandExpr) → not (interpNand b1) ≡ interpNand (NandNot b1)
--- not≡NandNot しんじつ = refl
+-- not≡NandNot 本物 = refl
 -- not≡NandNot (NandNand b1 b2) =
 --   begin
 --     not (interpNand (NandNand b1 b2))
@@ -200,7 +200,7 @@ NandOr b1 b2 = NandNot (NandAnd (NandNot b1) (NandNot b2))
 --                                       ; ff → refl } }
 
 Prop-to-Nand : PropExpr → NandExpr
-Prop-to-Nand echt = しんじつ
+Prop-to-Nand echt = 本物
 Prop-to-Nand falsch = NandFf
 Prop-to-Nand (нет b) = NandNot (Prop-to-Nand b)
 Prop-to-Nand (b1 かつ b2) = NandAnd (Prop-to-Nand b1) (Prop-to-Nand b2)
