@@ -386,18 +386,11 @@ idArr (Product C D) {x₁ , x₂} =
 comp (Product C D) {x₁ , y₁} {x₂ , y₂} {x₃ , y₃} (f₁ , f₂) (g₁ , g₂) =
   comp C f₁ g₁ , comp D f₂ g₂
 idArr-comp (Product C D) {x₁ , y₁} {x₂ , y₂} (f₁ , f₂) =
-  congₙ _,_ ((comp C (idArr C) f₁ , f₁) ∷ (comp D (idArr D) f₂ , f₂) ∷ [])
-            (idArr-comp C f₁            ∷ idArr-comp D f₂            ∷ [])
+  congₙ _,_ (idArr-comp C f₁ ∷ idArr-comp D f₂ ∷ [])
 comp-idArr (Product C D) {x₁ , y₁} {x₂ , y₂} (f₁ , f₂) =
-  congₙ _,_ ((comp C f₁ (idArr C) , f₁) ∷ (comp D f₂ (idArr D) , f₂) ∷ [])
-            (comp-idArr C f₁            ∷ comp-idArr D f₂            ∷ [])
+  congₙ _,_ (comp-idArr C f₁ ∷ comp-idArr D f₂ ∷ [])
 assoc (Product C D) {x₁ , x₂} {y₁ , y₂} {z₁ , z₂} {w₁ , w₂} (f₁ , f₂) (g₁ , g₂) (h₁ , h₂) =
-  congₙ _,_ ((comp C (comp C f₁ g₁) h₁ , comp C f₁ (comp C g₁ h₁)) ∷
-             (comp D (comp D f₂ g₂) h₂ , comp D f₂ (comp D g₂ h₂)) ∷
-             [])
-            (assoc C f₁ g₁ h₁ ∷
-             assoc D f₂ g₂ h₂ ∷
-             [])
+  congₙ _,_ (assoc C f₁ g₁ h₁ ∷ assoc D f₂ g₂ h₂ ∷ [])
 
 -- TASK
 -- "Doing nothing" is a functor, i.e. we don't change the objects and we don't change the arrows.

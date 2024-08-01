@@ -65,16 +65,16 @@ congₙ : {n : ℕ}
         {ts : Vec Set n}
         {rt : Set}
         (f : Nary (map id ts) rt)
-        (argss : HetVec {tf = (λ t → Pair t t)} ts)
+        {argss : HetVec {tf = (λ t → Pair t t)} ts}
         (args≡s : HetVec {tf = id} (hetliftmap (λ {t} (t₁ , t₂) → t₁ ≡ t₂) argss)) →
         applyₙ f (hetmap fst argss) ≡ applyₙ f (hetmap snd argss)
-congₙ f [] [] = refl
+congₙ f {[]} [] = refl
 -- congₙ {ts = t ∷ ts} f ((arg₁ , arg₂) ∷ argss) (refl ∷ args≡s) = congₙ {ts = ts} (f arg₁) argss args≡s
 congₙ f
-      ((arg₁ , arg₂) ∷ argss)
+      {((arg₁ , arg₂) ∷ argss)}
       (args≡ ∷ args≡s)
       with args≡
-... | refl = congₙ (f arg₁) argss args≡s
+... | refl = congₙ (f arg₁) {argss} args≡s
 
 module _ where
   proba₁ : ℕ
@@ -84,7 +84,7 @@ module _ where
   proba₂ = hetmap {tf₁ = λ t → Pair t t} fst (1 , 2 ∷ 2 , 3 ∷ [])
 
   proba₃ : 2 + 3 ≡ (1 + 1) + (1 + 1 + 1)
-  proba₃ = congₙ _+_ ((2 , (1 + 1)) ∷ (3 , (1 + 1 + 1)) ∷ []) (refl ∷ refl ∷ [])
+  proba₃ = congₙ _+_ ((begin 2 ∼⟨⟩ 1 + 1 ∎) ∷ (begin 3 ∼⟨⟩ 1 + 1 + 1 ∎) ∷ [])
 
   data Kek : Set where
     nula : Kek
